@@ -4,6 +4,7 @@ The Very Best Team - COVID-19 Overview Dashboard Project Plan
 1) covid19_summary
 Choose countries (high spread, low spread, high mortality, low mortality); around 3 from each group, list has 12 total - Vian 
 https://data.who.int/dashboards/covid19/data
+
 a) Sorta EDA moment - total global cases and total global deaths (for the dashboard) 
 
 b) Do we need to rename the names (ie. CÔøΩte d'Ivoire)?
