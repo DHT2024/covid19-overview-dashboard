@@ -5,6 +5,8 @@
 
 # Load necessary packages.
 library(tidyverse)
+library(httr)
+library(jsonlite)
 
 # Import data.
 COVID <- read.csv("~/TheVeryBest_CodingInR/WHO-COVID-19-global-table-data.csv")
@@ -114,3 +116,9 @@ ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   ylim(0, 800) +
   theme_minimal()
 
+# Extract demographic and socioeconomic indicator from World Bank API
+# Build query
+base <- "https://api.worldbank.org/v2"
+endpoint <- "/country/AUT;KOR;CYP;GUY;CUB;IRN;PER;HUN;BIH;BHS;DEU;GUM"
+query <- "/indicator/SP.POP.TOTL;EN.POP.DNST;NY.GDP.MKTP.CD;NY.GNP.MKTP.CD;SP.DYN.LE00.IN;SI.POV.NAHC;SI.POV.GINI;SE.ADT.LITR.ZS;NY.ADJ.NNTY.PC.CD;SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
+output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
