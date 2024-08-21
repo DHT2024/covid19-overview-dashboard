@@ -133,3 +133,6 @@ get_data$status_code
 
 # Extract content from the request
 get_data_text <- content(get_data, "text")
+
+# Convert JSON file into an R object
+get_data_json <- fromJSON(get_data_text, flatten = T)
