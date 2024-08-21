@@ -140,3 +140,12 @@ get_data_json <- fromJSON(get_data_text, flatten = T)
 # Converted information to dataframe
 socioecon_df <- get_data_json[2][[1]]
 socioecon_df
+
+# Renamed column names and select relevant columns
+socioecon_df <- socioecon_df %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
