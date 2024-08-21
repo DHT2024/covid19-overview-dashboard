@@ -15,10 +15,9 @@ str(COVID)
 names(COVID)
 
 # The global stats for total cumulative cases and per 100k population and total cumulative deaths and per 100k population
-COVID_global <- COVID_clean %>%
-  arrange(desc(Cases.Cumulative.Per.100k)) %>% 
+COVID_global <- COVID %>%
+  arrange(desc(Cases...cumulative.total)) %>% 
   head(1)
-
 
 # Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population,
 # and Deaths...cumulative.total.per.100000.population and rename the variables.
