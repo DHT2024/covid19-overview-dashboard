@@ -1,13 +1,15 @@
 ---
-title: "Untitled"
+title: "COVID-19 Global Pandemic"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+    orientation: rows
     vertical_layout: fill
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(dplyr)
+library(ggplot2)
 ```
 
 Column {data-width=650}
