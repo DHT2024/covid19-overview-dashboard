@@ -130,3 +130,6 @@ call
 # Get info from call and check status
 get_data <- GET(call_final)
 get_data$status_code
+
+# Extract content from the request
+get_data_text <- content(get_data, "text")
