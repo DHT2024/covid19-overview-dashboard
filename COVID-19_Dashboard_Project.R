@@ -92,3 +92,24 @@ ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   ylim(0, 800) +
   theme_minimal()
 
+# Low Mortality Countries 
+
+# Select three other countries where number of total deaths per 100K population is less than 250. 
+# Filter Deaths.Cumulative.Per.100k with less than 250 deaths and arrange in descending order.
+COVID_low_mortality <- COVID_clean %>%
+  filter(Deaths.Cumulative.Per.100k < 250) %>%
+  arrange(desc(Deaths.Cumulative.Per.100k))
+
+# The countries selected to represent the countries with <10,000 deaths per 100k population are 
+# Guam, Bahamas, Germany
+COVID_low_mortality <- COVID_low_mortality %>% 
+  filter(Name %in% c("Guam", "Bahamas", "Germany"))
+
+# Plot the countries with <10k total death per 100k population.
+ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Low Mortality Countries",
+       x = "Country",
+       y = "Cumulative Deaths Per 100K Population") +
+  ylim(0, 800) +
+  theme_minimal()
