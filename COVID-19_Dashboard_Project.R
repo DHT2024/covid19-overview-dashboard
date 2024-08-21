@@ -122,3 +122,7 @@ base <- "https://api.worldbank.org/v2"
 endpoint <- "/country/AUT;KOR;CYP;GUY;CUB;IRN;PER;HUN;BIH;BHS;DEU;GUM"
 query <- "/indicator/SP.POP.TOTL;EN.POP.DNST;NY.GDP.MKTP.CD;NY.GNP.MKTP.CD;SP.DYN.LE00.IN;SI.POV.NAHC;SI.POV.GINI;SE.ADT.LITR.ZS;NY.ADJ.NNTY.PC.CD;SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
 output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
+
+# Combine all parts of the query to produce a call
+call <- paste0(base, endpoint, query, output_format)
+call
