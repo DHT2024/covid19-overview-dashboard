@@ -69,3 +69,4 @@ ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
        y = "Cumulative Cases Per 100K Population") +
   ylim(0, 80000) +
   theme_minimal()
+
