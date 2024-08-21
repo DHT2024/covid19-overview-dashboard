@@ -70,3 +70,25 @@ ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
   ylim(0, 80000) +
   theme_minimal()
 
+# High Mortality Countries 
+
+# Select three countries from the top 10 countries with the highest number of total deaths per 100K population.
+# Arrange the Deaths.Cumulative.Per.100k column from descending and isolate the top 10 countries. 
+COVID_high_mortality <- COVID_clean %>%
+  arrange(desc(Deaths.Cumulative.Per.100k)) %>% 
+  head(11) # Filter for the top 11 entries because Global is also included in the top Deaths.Cumulative.Per.100k
+
+# The countries selected to represent the countries with the highest number of total deaths per 100k population are 
+# Peru, Hungary, and Bosnia and Herzegovina. 
+COVID_high_mortality <- COVID_high_mortality %>%
+  filter(Name %in% c("Peru", "Hungary", "Bosnia and Herzegovina"))
+
+# Plot the countries with one of the highest number of total death per 100k population. 
+ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "High Mortality Countries",
+       x = "Country",
+       y = "Cumulative Deaths Per 100K Population") +
+  ylim(0, 800) +
+  theme_minimal()
+
