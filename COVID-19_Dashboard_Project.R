@@ -14,17 +14,18 @@ summary(COVID)
 str(COVID)
 names(COVID)
 
+# The global stats for total cumulative cases and per 100k population and total cumulative deaths and per 100k population
+COVID_global <- COVID_clean %>%
+  arrange(desc(Cases.Cumulative.Per.100k)) %>% 
+  head(1)
+
+
 # Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population,
 # and Deaths...cumulative.total.per.100000.population and rename the variables.
 COVID_clean <- COVID %>% 
   select(Name, WHO.Region, 
          Cases.Cumulative.Per.100k = Cases...cumulative.total.per.100000.population, 
          Deaths.Cumulative.Per.100k = Deaths...cumulative.total.per.100000.population)
-
-# The global stats for total cumulative cases per 100k population and total cumulative deaths per 100k population
-COVID_global <- COVID_clean %>%
-  arrange(desc(Cases.Cumulative.Per.100k)) %>% 
-  head(1)
 
 # High Spread Countries
 
@@ -113,3 +114,4 @@ ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
        y = "Cumulative Deaths Per 100K Population") +
   ylim(0, 800) +
   theme_minimal()
+
