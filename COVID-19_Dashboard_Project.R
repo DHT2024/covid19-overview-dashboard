@@ -126,3 +126,7 @@ output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
 # Combine all parts of the query to produce a call
 call <- paste0(base, endpoint, query, output_format)
 call
+
+# Get info from call and check status
+get_data <- GET(call_final)
+get_data$status_code
