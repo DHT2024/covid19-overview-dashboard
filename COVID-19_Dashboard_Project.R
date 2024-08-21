@@ -47,3 +47,25 @@ ggplot(COVID_high_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
        y = "Cumulative Cases Per 100K Population") +
   ylim(0, 80000) +
   theme_minimal()
+
+#Low Spread Countries 
+
+# Select three other countries where number of total cases per 100K population is less than 10,000.
+# Filter Cases.Cumulative.Per.100k with less than 10000 cases and arrange in descending order.
+COVID_low_spread <- COVID_clean %>%
+  filter(Cases.Cumulative.Per.100k < 10000) %>%
+  arrange(desc(Cases.Cumulative.Per.100k))
+
+# The countries selected to represent the countries with <10,000 cases per 100k population are 
+# Cuba, Guyana, Iran.
+COVID_low_spread <- COVID_low_spread %>%
+  filter(Name %in% c("Cuba", "Guyana", "Iran (Islamic Republic of)"))
+
+# Plot the countries with <10k total cases per 100k population.
+ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Low Spread Countries",
+       x = "Country",
+       y = "Cumulative Cases Per 100K Population") +
+  ylim(0, 80000) +
+  theme_minimal()
