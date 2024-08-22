@@ -332,3 +332,27 @@ average_mr <- average_mr %>%
   rename("Country" = "covid_mr_2020$Country") %>%
   mutate(avg_mr = (mr_2020 + mr_2021 + mr_2022)/3)
 average_mr$avg_mr_percent <- average_mr$avg_mr*100
+
+#### Statistical Analysis ####
+
+socioecon_df_v2 <- socioecon_df %>%
+  group_by(country, socioecon_id) %>%
+  summarize(avg_values = mean(value, na.rm = T))
+
+# Total Population for each country
+# Adding thresholds and converting grade to factor
+socioecon_df_pop <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.POP.TOTL"),]
+socioecon_df_pop <- socioecon_df_pop %>%
+  mutate(pop_grade = cut(avg_values, breaks = c(0, 1e6, 10e6, 25e6, 50e6, Inf), 
+                         labels = c("Very Small", "Small", "Medium", "Large", "Very Large")))
+socioecon_df_pop$pop_grade <- factor(socioecon_df_pop$pop_grade, 
+                                     levels = c("Very Small", "Small", "Medium", "Large", "Very Large"))
+
+# Population Density for each country
+# Adding thresholds and converting grade to factor
+# socioecon_df_pop <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "EN.POP.DNST"),]
+# socioecon_df_pop <- socioecon_df_pop %>%
+  # mutate(pop_grade = cut(avg_values, breaks = c(0, 1e6, 10e6, 25e6, 50e6, Inf), 
+                         # labels = c("Very Small", "Small", "Medium", "Large", "Very Large")))
+# socioecon_df_pop$pop_grade <- factor(socioecon_df_pop$pop_grade, 
+                                    # levels = c("Very Small", "Small", "Medium", "Large", "Very Large"))
