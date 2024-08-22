@@ -21,34 +21,28 @@ g) Select three other countries where number of total deaths per 100K population
 
 Maybe display it as graphs of the 3 choices and their respective cumulative case/death score?
 
-2) primary_socioeconomic_indicators - Bilal
+2) socioeconomic_indicators - Bilal
 
-a) Obtain socioeconomic indicators from API
+a) Obtain primary and additional socioeconomic indicators from API
 
 b) GDP, GNI (Economy), education, health (People), poverty, GINI index
-
-c)Thresholds for socioeconomic indicators
 
 3) peak_pandemic - Tenzin
 
 a) Calculate prevalence, case fatality rate, and mortality rate
 
-4) additional_socioeconomic_indicators - Trinley
+4) statistical_analysis - Bilal, Tenzin
 
-a) population density, income, economic inequality, GINI index score, education 
+a) Thresholds for socioeconomic indicators
 
-b) Thresholds for socioeconomic indicators
+b) Single out one indicator that is the best indicators 
 
-5) statistical_analysis - Bilal, Tenzin
+c) run some quick and dirty analysis on all your indicators to figure out which one looks the strongest
 
-a) Single out one indicator that is the best indicators 
+d) ANOVA
 
-b) run some quick and dirty analysis on all your indicators to figure out which one looks the strongest
+e) Regression and p value
 
-c) ANOVA
+f) Correlation  
 
-d) Regression and p value
-
-e) Correlation  
-
-6) dashboard_creation - Vian, Trinley
+5) dashboard_creation - Vian, Trinley
