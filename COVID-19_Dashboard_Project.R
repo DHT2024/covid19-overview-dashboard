@@ -339,20 +339,192 @@ socioecon_df_v2 <- socioecon_df %>%
   group_by(country, socioecon_id) %>%
   summarize(avg_values = mean(value, na.rm = T))
 
+# Extract demographic and socioeconomic indicator from World Bank API to create
+# a dataframe with data for all countries
+# To aid with setting thresholds
+# Build query
+endpoint_all <- "/country"
+query_all_v2 <- "/indicator/SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
+# Combine all parts of the query to produce a call
+call_all <- paste0(base, endpoint_all, query, output_format)
+call_all
+
+call_all_v2 <- paste0(base, endpoint_all, query_all_v2, output_format)
+call_all_v2
+# Get info from call and check status
+get_data_all <- GET(call_all)
+get_data_all$status_code
+
+get_data_all_v2 <- GET(call_all_v2)
+get_data_all_v2$status_code
+# Extract content from the request
+get_data_text_all <- content(get_data_all, "text")
+
+get_data_text_all_v2 <- content(get_data_all_v2, "text")
+# Convert JSON file into an R object
+get_data_json_all <- fromJSON(get_data_text_all, flatten = T)
+
+get_data_json_all_v2 <- fromJSON(get_data_text_all_v2, flatten = T)
+# Converted information to dataframe
+socioecon_df_all <- get_data_json_all[2][[1]]
+socioecon_df_all
+
+socioecon_df_all_v2 <- get_data_json_all_v2[2][[1]]
+socioecon_df_all_v2
+# Renamed column names and select relevant columns
+socioecon_df_all <- socioecon_df_all %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+socioecon_df_all_v2 <- socioecon_df_all_v2 %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
 # Total Population for each country
-# Adding thresholds and converting grade to factor
 socioecon_df_pop <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.POP.TOTL"),]
+
+# Checking for distribution of global population data
+pop_indices <- which(socioecon_df_all$socioecon_id == "SP.POP.TOTL")
+quantile(socioecon_df_all$value[pop_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
 socioecon_df_pop <- socioecon_df_pop %>%
-  mutate(pop_grade = cut(avg_values, breaks = c(0, 1e6, 10e6, 25e6, 50e6, Inf), 
+  mutate(pop_grade = cut(avg_values, breaks = c(0, 724273, 5685807, 19603733, 125998302, Inf), 
                          labels = c("Very Small", "Small", "Medium", "Large", "Very Large")))
 socioecon_df_pop$pop_grade <- factor(socioecon_df_pop$pop_grade, 
                                      levels = c("Very Small", "Small", "Medium", "Large", "Very Large"))
 
 # Population Density for each country
+socioecon_df_pop_den <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "EN.POP.DNST"),]
+
+# Checking for distribution of global population density data
+pop_den_indices <- which(socioecon_df_all$socioecon_id == "EN.POP.DNST")
+quantile(socioecon_df_all$value[pop_den_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
 # Adding thresholds and converting grade to factor
-# socioecon_df_pop <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "EN.POP.DNST"),]
-# socioecon_df_pop <- socioecon_df_pop %>%
-  # mutate(pop_grade = cut(avg_values, breaks = c(0, 1e6, 10e6, 25e6, 50e6, Inf), 
-                         # labels = c("Very Small", "Small", "Medium", "Large", "Very Large")))
-# socioecon_df_pop$pop_grade <- factor(socioecon_df_pop$pop_grade, 
-                                    # levels = c("Very Small", "Small", "Medium", "Large", "Very Large"))
+socioecon_df_pop_den <- socioecon_df_pop_den %>%
+  mutate(pop_den_grade = cut(avg_values, breaks = c(0, 30.53911, 60.19171, 107.56739, 241.18333, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_pop_den$pop_den_grade <- factor(socioecon_df_pop_den$pop_den_grade, 
+                              levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# GDP for each country
+socioecon_df_gdp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "NY.GDP.MKTP.CD"),]
+
+# Checking for distribution of global GDP data
+gdp_indices <- which(socioecon_df_all$socioecon_id == "NY.GDP.MKTP.CD")
+quantile(socioecon_df_all$value[gdp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_gdp <- socioecon_df_gdp %>%
+  mutate(gdp_grade = cut(avg_values, breaks = c(0, 6.887147e+09, 2.611333e+10, 1.648734e+11, 1.414560e+12, Inf), 
+                             labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_gdp$gdp_grade <- factor(socioecon_df_gdp$gdp_grade, 
+                                             levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# GNI for each country
+socioecon_df_gni <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "NY.GNP.MKTP.CD"),]
+
+# Checking for distribution of global GNI data
+gni_indices <- which(socioecon_df_all$socioecon_id == "NY.GNP.MKTP.CD")
+quantile(socioecon_df_all$value[gni_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_gni <- socioecon_df_gni %>%
+  mutate(gni_grade = cut(avg_values, breaks = c(0, 8.209395e+09, 2.896157e+10, 1.939661e+11, 1.429618e+12, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_gni$gni_grade <- factor(socioecon_df_gni$gni_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Life expectancy for each country
+socioecon_df_le <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.LE00.IN"),]
+
+# Checking for distribution of global life expectancy data
+le_indices <- which(socioecon_df_all$socioecon_id == "SP.DYN.LE00.IN")
+quantile(socioecon_df_all$value[le_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_le <- socioecon_df_le %>%
+  mutate(le_grade = cut(avg_values, breaks = c(0, 64.48500, 70.98600, 74.25366, 78.94400, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_le$le_grade <- factor(socioecon_df_le$le_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Birth rate (per 1000) for each country
+socioecon_df_br <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.CBRT.IN"),]
+
+# Checking for distribution of global birth rate data
+br_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.DYN.CBRT.IN")
+quantile(socioecon_df_all_v2$value[br_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_br <- socioecon_df_br %>%
+  mutate(br_grade = cut(avg_values, breaks = c(0, 10.000, 13.099, 18.791, 28.706, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_br$br_grade <- factor(socioecon_df_br$br_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Death rate (per 1000) for each country
+socioecon_df_dr <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.CDRT.IN"),]
+
+# Checking for distribution of global death rate data
+dr_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.DYN.CDRT.IN")
+quantile(socioecon_df_all_v2$value[dr_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_dr <- socioecon_df_dr %>%
+  mutate(dr_grade = cut(avg_values, breaks = c(0, 6.253, 7.448, 8.661, 10.200, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_dr$dr_grade <- factor(socioecon_df_dr$dr_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Population growth % for each country
+socioecon_df_pgp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.POP.GROW"),]
+
+# Checking for distribution of global population growth % data
+pgp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.POP.GROW")
+quantile(socioecon_df_all_v2$value[pgp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_pgp <- socioecon_df_pgp %>%
+  mutate(pgp_grade = cut(avg_values, breaks = c(-999, 0.08169316, 0.69471769, 1.23729900, 2.17409124, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_pgp$pgp_grade <- factor(socioecon_df_pgp$pgp_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Urban population % for each country
+socioecon_df_upp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.URB.TOTL.IN.ZS"),]
+
+# Checking for distribution of global urban population % data
+upp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.URB.TOTL.IN.ZS")
+quantile(socioecon_df_all_v2$value[upp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_upp <- socioecon_df_upp %>%
+  mutate(upp_grade = cut(avg_values, breaks = c(0, 38.54600, 55.11800, 67.84700, 81.85058, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_upp$upp_grade <- factor(socioecon_df_upp$upp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Rural population % for each country
+socioecon_df_rpp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.RUR.TOTL.ZS"),]
+
+# Checking for distribution of global rural population % data
+rpp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.RUR.TOTL.ZS")
+quantile(socioecon_df_all_v2$value[rpp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_rpp <- socioecon_df_rpp %>%
+  mutate(rpp_grade = cut(avg_values, breaks = c(0, 18.14942, 32.15300, 44.88200, 61.45400, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_rpp$rpp_grade <- factor(socioecon_df_rpp$rpp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
