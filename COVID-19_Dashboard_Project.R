@@ -5,6 +5,8 @@
 
 # Load necessary packages.
 library(tidyverse)
+library(httr)
+library(jsonlite)
 
 # Import data.
 COVID <- read.csv("~/TheVeryBest_CodingInR/WHO-COVID-19-global-table-data.csv")
@@ -114,3 +116,36 @@ ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   ylim(0, 800) +
   theme_minimal()
 
+# Extract demographic and socioeconomic indicator from World Bank API
+# Build query
+base <- "https://api.worldbank.org/v2"
+endpoint <- "/country/AUT;KOR;CYP;GUY;CUB;IRN;PER;HUN;BIH;BHS;DEU;GUM"
+query <- "/indicator/SP.POP.TOTL;EN.POP.DNST;NY.GDP.MKTP.CD;NY.GNP.MKTP.CD;SP.DYN.LE00.IN;SI.POV.NAHC;SI.POV.GINI;SE.ADT.LITR.ZS;NY.ADJ.NNTY.PC.CD;SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
+output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
+
+# Combine all parts of the query to produce a call
+call <- paste0(base, endpoint, query, output_format)
+call
+
+# Get info from call and check status
+get_data <- GET(call)
+get_data$status_code
+
+# Extract content from the request
+get_data_text <- content(get_data, "text")
+
+# Convert JSON file into an R object
+get_data_json <- fromJSON(get_data_text, flatten = T)
+
+# Converted information to dataframe
+socioecon_df <- get_data_json[2][[1]]
+socioecon_df
+
+# Renamed column names and select relevant columns
+socioecon_df <- socioecon_df %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
