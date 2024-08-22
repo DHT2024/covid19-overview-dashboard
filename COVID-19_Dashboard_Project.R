@@ -155,7 +155,7 @@ covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
 
 # Filtered covid data with dates by countries of interest.
 covid_dates_countries <- covid_dates %>%
-  filter(Country %in% c("Austria", "Bahamas", "Bosnia and Herzegovina", "Cuba", "Cyprus", "Germany", "Guam", "Guyana", "Hungary", "Iran (Islamic Republic of)", "Republic of Korea", "Peru")) %>%
+  filter(Country %in% c("Austria", "Bahamas", "Bosnia and Herzegovina", "Cuba", "Cyprus", "Germany", "Guam", "Guyana", "Hungary", "Iran (Islamic Republic of)", "Republic of Korea", "Peru"))
 
 # Converted dates in covid data with dates to date format.
 covid_dates_countries$Date_reported <- as.POSIXct(covid_dates_countries$Date_reported)
@@ -194,6 +194,7 @@ covid_prevalence_2020 <- covid_dates_2020
 prevalence_2020 <- covid_dates_2020$cases_2020 / country_population_2020$value
 covid_prevalence_2020$population_2020 <- country_population_2020$value
 covid_prevalence_2020$prevalence_2020 <- prevalence_2020
+covid_prevalence_2020$prevalence_2020_percent <- covid_prevalence_2020$prevalence_2020*100
 View(covid_prevalence_2020)
 
 # Prevalence in 2021 = Confirmed Cases (2021) / Population (2021)
@@ -206,6 +207,7 @@ covid_prevalence_2021 <- covid_dates_2021
 prevalence_2021 <- covid_dates_2021$cases_2021 / country_population_2021$value
 covid_prevalence_2021$population_2021 <- country_population_2021$value
 covid_prevalence_2021$prevalence_2021 <- prevalence_2021
+covid_prevalence_2021$prevalence_2021_percent <- covid_prevalence_2021$prevalence_2021*100
 View(covid_prevalence_2021)
 
 # Prevalence in 2022 = Confirmed Cases (2022) / Population (2022)
@@ -218,6 +220,7 @@ covid_prevalence_2022 <- covid_dates_2022
 prevalence_2022 <- covid_dates_2022$cases_2022 / country_population_2022$value
 covid_prevalence_2022$population_2022 <- country_population_2022$value
 covid_prevalence_2022$prevalence_2022 <- prevalence_2022
+covid_prevalence_2022$prevalence_2022_percent <- covid_prevalence_2022$prevalence_2022*100
 View(covid_prevalence_2022)
 
 # Average Prevalence over 2020-2022 = Avg()
@@ -229,3 +232,54 @@ average_prevalence$prevalence_2022 <- covid_prevalence_2022$prevalence_2022
 average_prevalence <- average_prevalence %>%
   rename("Country" = "covid_prevalence_2020$Country") %>%
   mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
+average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*100
+
+#### Case Fatality Rate ####
+# CFR in 2020 = Confirmed Deaths (2020) / Confirmed Cases (2020)
+covid_deaths_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2020 = sum(New_cases, na.rm = T),
+            deaths_2020 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2020 <- covid_deaths_2020
+covid_cfr_2020$cfr_2020 <- covid_cfr_2020$deaths_2020 / covid_cfr_2020$cases_2020
+covid_cfr_2020$cfr_2020_percent <- covid_cfr_2020$cfr_2020*100
+View(covid_cfr_2020)
+
+# CFR in 2021 = Confirmed Deaths (2021) / Confirmed Cases (2021)
+covid_deaths_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2021 = sum(New_cases, na.rm = T),
+            deaths_2021 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2021 <- covid_deaths_2021
+covid_cfr_2021$cfr_2021 <- covid_cfr_2021$deaths_2021 / covid_cfr_2021$cases_2021
+covid_cfr_2021$cfr_2021_percent <- covid_cfr_2021$cfr_2021*100
+View(covid_cfr_2021)
+
+# CFR in 2022 = Confirmed Deaths (2022) / Confirmed Cases (2022)
+covid_deaths_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2022 = sum(New_cases, na.rm = T),
+            deaths_2022 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2022 <- covid_deaths_2022
+covid_cfr_2022$cfr_2022 <- covid_cfr_2022$deaths_2022 / covid_cfr_2022$cases_2022
+covid_cfr_2022$cfr_2022_percent <- covid_cfr_2022$cfr_2022*100
+View(covid_cfr_2022)
+
+# Average CFR over 2020-2022 = Avg()
+average_cfr <- as.data.frame(covid_cfr_2020$Country)
+average_cfr$cfr_2020 <- covid_cfr_2020$cfr_2020
+average_cfr$cfr_2021 <- covid_cfr_2021$cfr_2021
+average_cfr$cfr_2022 <- covid_cfr_2022$cfr_2022
+
+average_cfr <- average_cfr %>%
+  rename("Country" = "covid_cfr_2020$Country") %>%
+  mutate(avg_cfr = (cfr_2020 + cfr_2021 + cfr_2022)/3)
+average_cfr$avg_cfr_percent <- average_cfr$avg_cfr*100
+
+#### Mortality Rate ####
