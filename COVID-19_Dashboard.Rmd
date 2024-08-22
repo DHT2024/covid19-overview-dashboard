@@ -11,6 +11,8 @@ library(flexdashboard)
 library(tidyverse)
 library(ggplot2)
 library(shiny)
+library(httr)
+library(jsonlite)
 ```
 
 ```{r COVID-19 summary, include=FALSE}
@@ -201,11 +203,9 @@ output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
 
 # Combine all parts of the query to produce a call
 call <- paste0(base, endpoint, query, output_format)
-call
 
 # Get info from call and check status
 get_data <- GET(call)
-get_data$status_code
 
 # Extract content from the request
 get_data_text <- content(get_data, "text")
@@ -215,7 +215,6 @@ get_data_json <- fromJSON(get_data_text, flatten = T)
 
 # Converted information to dataframe
 socioecon_df <- get_data_json[2][[1]]
-socioecon_df
 
 # Renamed column names and select relevant columns
 socioecon_df <- socioecon_df %>% rename(
@@ -225,6 +224,56 @@ socioecon_df <- socioecon_df %>% rename(
   socioecon_indicator = indicator.value,
   country = country.value
 ) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+```
+
+### NAME
+
+```{r}
+
+#gameplan 
+# make a dataset for each indicator
+# group by country 
+
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
+  
+  # Give the page a title
+  titlePanel("Population by Country"),
+  
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput("country", "Country:", 
+                  choices= unique(socioecon_df$country)),
+      hr(),
+      helpText("Data from World Bank Group (2022).")
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput("countryPlot")  
+    )
+    
+  )
+)
+
+# Define a server for the Shiny app
+server <- function(input, output) {
+  # Fill in the spot we created for a plot
+  output$phonePlot <- renderPlot({
+    
+    # Render a barplot
+    barplot(WorldPhones[,input$region]*1000, 
+            main=input$region,
+            ylab="Year",
+            xlab="Population Size")
+  })
+}
+
+shinyApp(ui, server)
 
 ```
 
