@@ -9,7 +9,7 @@ library(httr)
 library(jsonlite)
 
 # Import data.
-COVID <- read.csv("~/TheVeryBest_CodingInR/WHO-COVID-19-global-table-data.csv")
+COVID <- read.csv("WHO-COVID-19-global-table-data.csv")
 
 # Explore data.
 summary(COVID)
@@ -149,3 +149,5 @@ socioecon_df <- socioecon_df %>% rename(
   socioecon_indicator = indicator.value,
   country = country.value
 ) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
