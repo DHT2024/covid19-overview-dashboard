@@ -150,4 +150,82 @@ socioecon_df <- socioecon_df %>% rename(
   country = country.value
 ) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
 
+# Import covid data with dates
 covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
+
+# Filtered covid data with dates by countries of interest.
+covid_dates_countries <- covid_dates %>%
+  filter(Country %in% c("Austria", "Bahamas", "Bosnia and Herzegovina", "Cuba", "Cyprus", "Germany", "Guam", "Guyana", "Hungary", "Iran (Islamic Republic of)", "Republic of Korea", "Peru")) %>%
+
+# Converted dates in covid data with dates to date format.
+covid_dates_countries$Date_reported <- as.POSIXct(covid_dates_countries$Date_reported)
+# Filtered observations between start of 2020 to end of 2022.
+covid_dates_countries_dates <- covid_dates_countries %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2022-12-31")))
+
+# Change names in API data frame to match covid data with dates.
+socioecon_df$country[which(socioecon_df$country == "Bahamas, The")] <- "Bahamas"
+socioecon_df$country[which(socioecon_df$country == "Iran, Islamic Rep.")] <- "Iran (Islamic Republic of)"
+socioecon_df$country[which(socioecon_df$country == "Korea, Rep.")] <- "Republic of Korea"
+
+# Filtered API data by year and population data, then alphabetizing.
+country_population_2020 <- socioecon_df %>%
+  filter(socioecon_id %in% c("SP.POP.TOTL")) %>%
+  filter(year %in% c("2020")) %>%
+  arrange(country)
+
+country_population_2021 <- socioecon_df %>%
+  filter(socioecon_id %in% c("SP.POP.TOTL")) %>%
+  filter(year %in% c("2021")) %>% 
+  arrange(country)
+
+country_population_2022 <- socioecon_df %>%
+  filter(socioecon_id %in% c("SP.POP.TOTL")) %>%
+  filter(year %in% c("2022")) %>%
+  arrange(country)
+
+# Prevalence in 2020 = Confirmed Cases (2020) / Population (2020)
+covid_dates_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2020 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2020 <- covid_dates_2020
+prevalence_2020 <- covid_dates_2020$cases_2020 / country_population_2020$value
+covid_prevalence_2020$population_2020 <- country_population_2020$value
+covid_prevalence_2020$prevalence_2020 <- prevalence_2020
+View(covid_prevalence_2020)
+
+# Prevalence in 2021 = Confirmed Cases (2021) / Population (2021)
+covid_dates_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2021 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2021 <- covid_dates_2021
+prevalence_2021 <- covid_dates_2021$cases_2021 / country_population_2021$value
+covid_prevalence_2021$population_2021 <- country_population_2021$value
+covid_prevalence_2021$prevalence_2021 <- prevalence_2021
+View(covid_prevalence_2021)
+
+# Prevalence in 2022 = Confirmed Cases (2022) / Population (2022)
+covid_dates_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2022 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2022 <- covid_dates_2022
+prevalence_2022 <- covid_dates_2022$cases_2022 / country_population_2022$value
+covid_prevalence_2022$population_2022 <- country_population_2022$value
+covid_prevalence_2022$prevalence_2022 <- prevalence_2022
+View(covid_prevalence_2022)
+
+# Average Prevalence over 2020-2022 = Avg()
+average_prevalence <- as.data.frame(covid_prevalence_2020$Country)
+average_prevalence$prevalence_2020 <- covid_prevalence_2020$prevalence_2020
+average_prevalence$prevalence_2021 <- covid_prevalence_2021$prevalence_2021
+average_prevalence$prevalence_2022 <- covid_prevalence_2022$prevalence_2022
+
+average_prevalence <- average_prevalence %>%
+  rename("Country" = "covid_prevalence_2020$Country") %>%
+  mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
