@@ -17,7 +17,7 @@ library(jsonlite)
 
 ```{r COVID-19 summary, include=FALSE}
 # Import data.
-COVID <- read.csv("~/TheVeryBest_CodingInR/WHO-COVID-19-global-table-data.csv")
+COVID <- read.csv("WHO-COVID-19-global-table-data.csv")
 
 # The global stats for total cumulative cases and per 100k population and total cumulative deaths and per 100k population
 COVID_global <- COVID %>%
