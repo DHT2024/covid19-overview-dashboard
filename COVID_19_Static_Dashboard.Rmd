@@ -8,6 +8,10 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(tidyverse)
+library(ggplot2)
+library(httr)
+library(jsonlite)
 ```
 
 Column {data-width=650}
