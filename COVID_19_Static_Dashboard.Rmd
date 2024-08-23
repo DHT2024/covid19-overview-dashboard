@@ -189,7 +189,7 @@ ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   theme_minimal()
 ```
 
-Socioeconomic Indicators
+Country Indicators
 =======================================================================
 
 ```{r API}
@@ -251,4 +251,83 @@ cleaned_socioecon <- cleaned_socioecon %>%
   arrange(country, year)
 
 ```
+
+Row {data-height=50}
+-----------------------------------------------------------------------
+**Population Indicators**
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Total Population
+```{r}
+# Plot total population for all countries
+
+ggplot(cleaned_socioecon, 
+       aes(x = pop_total, y = reorder(country, pop_total), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Population Total by Country (2020-2022)",
+       x = "Total Population",
+       y = "Country") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+
+### Population Density
+
+
+### Urban Population (%)
+
+
+### Rural population (%)
+
+
+### Birth Rate
+
+
+### Death Rate
+
+
+### Annual Population Growth (%)
+
+
+Row {data-height=50}
+-----------------------------------------------------------------------
+**Economic Indicators**
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### GDP (current US$)
+
+
+### GNI (current US$)
+
+
+### Adjusted Net National Income per Capita (current US$)
+
+
+### Poverty Headcount Ratio
+
+
+Row {data-height=50}
+-----------------------------------------------------------------------
+**Social Indicators**
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Life Expectancy 
+
+
+### GINI Index
+
+
+### Literacy Rate
+
+
+
+
 
