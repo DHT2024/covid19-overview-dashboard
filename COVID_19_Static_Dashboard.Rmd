@@ -53,6 +53,16 @@ valueBox(value = "775,867,542",
 
 ```
 
+### Total Cases per 100k Population  
+
+```{r valueboxes_total_cases_per_100k}
+valueBox(value = "4,798,837",
+         caption = "Total Global Cases per 100k Population",
+         icon = "ion-thermometer",
+         color = "#b3cde0")
+
+```
+
 Column {data-width=350}
 -----------------------------------------------------------------------
 
