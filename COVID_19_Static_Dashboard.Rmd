@@ -114,3 +114,26 @@ ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
   theme_minimal()
 ```
 
+Row {data-height=125}
+-----------------------------------------------------------------------
+
+### Total Deaths
+
+```{r valueboxes_total_deaths}
+valueBox(value = "7,057,145",
+         caption = "Total Global Deaths",
+         icon = "ion-alert-circled",
+         color = "#b3cde0")
+
+```
+
+### Total Deaths per 100k Population  
+
+```{r valueboxes_total_deaths_per_100k}
+valueBox(value = "29,394",
+         caption = "Total Global Deaths per 100k Population",
+         icon = "ion-alert-circled",
+         color = "#b3cde0")
+
+```
+
