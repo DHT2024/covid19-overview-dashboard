@@ -403,7 +403,23 @@ Row {.tabset .tabset-fade}
 
 
 ### GNI (current US$)
+```{r}
 
+# Plot GNI for all countries
+ggplot(cleaned_socioecon %>% filter(!is.na(gni)), 
+       aes(x = gni, 
+           y = reorder(country, gni), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Gross National Income (GNI) in Current USD by Country (2020-2022)",
+       x = "Gross National Income (in USD)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 ### Adjusted Net National Income per Capita (current US$)
 ```{r}
@@ -425,9 +441,24 @@ ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)),
   theme(legend.position = "top")
 ```
 
-
 ### Poverty Headcount Ratio
+```{r}
 
+# Plot poverty headcount ratio for all countries
+ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)), 
+       aes(x = poverty_ratio, 
+           y = reorder(country, poverty_ratio), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Poverty Headcount Ratio at National Poverty Line (% of Population) by Country (2020-2022)",
+       x = "Poverty Headcount Ratio (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 Row {data-height=50}
 -----------------------------------------------------------------------
