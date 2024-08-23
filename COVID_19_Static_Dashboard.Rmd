@@ -216,12 +216,34 @@ get_data_json <- fromJSON(get_data_text, flatten = T)
 socioecon_df <- get_data_json[2][[1]]
 
 # Renamed column names and select relevant columns
-socioecon_df <- socioecon_df %>% rename(
-  country_iso = countryiso3code,
-  year = date,
-  socioecon_id = indicator.id,
-  socioecon_indicator = indicator.value,
-  country = country.value
-) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+socioecon_df <- socioecon_df %>% 
+  rename(
+    country_iso = countryiso3code,
+    year = date,
+    socioecon_id = indicator.id,
+    socioecon_indicator = indicator.value,
+    country = country.value
+    ) %>% 
+  select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+# Renamed values in socioeconomic indicators dataframe to make pivoting dataframe easier
+socioecon_df$country[which(socioecon_df$country == "Bahamas, The")] <- "Bahamas"
+socioecon_df$country[which(socioecon_df$country == "Iran, Islamic Rep.")] <- "Iran (Islamic Republic of)"
+socioecon_df$country[which(socioecon_df$country == "Korea, Rep.")] <- "Republic of Korea"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population, total")] <- "pop_total"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population density (people per sq. km of land area)")] <- "pop_density"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "GDP (current US$)")] <- "gdp"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "GNI (current US$)")] <- "gni"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Life expectancy at birth, total (years)")] <- "life_expectancy"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Poverty headcount ratio at national poverty lines (% of population)")] <- "poverty_ratio"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Gini index")] <- "gini"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Literacy rate, adult total (% of people ages 15 and above)")] <- "literacy_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Adjusted net national income per capita (current US$)")] <- "national_income_capita"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Birth rate, crude (per 1,000 people)")] <- "birth_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Death rate, crude (per 1,000 people)")] <- "death_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population growth (annual %)")] <- "pop_growth"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Urban population (% of total population)")] <- "urban_pop"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Rural population (% of total population)")] <- "rural_pop"
 
 ```
+
