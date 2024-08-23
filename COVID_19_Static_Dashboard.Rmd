@@ -252,3 +252,58 @@ cleaned_socioecon <- cleaned_socioecon %>%
 
 ```
 
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Total Population
+
+
+### Population Density
+
+
+### Urban Population (%)
+
+
+### Rural population (%)
+
+
+### Birth Rate
+
+
+### Death Rate
+
+
+### Annual Population Growth (%)
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### GDP (current US$)
+
+
+### GNI (current US$)
+
+
+### Adjusted Net National Income per Capita (current US$)
+
+
+### Poverty Headcount Ratio
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Life Expectancy 
+
+
+### GINI Index
+
+
+### Literacy Rate
+
+
+
+
+
