@@ -274,7 +274,6 @@ ggplot(cleaned_socioecon,
   theme(legend.position = "top")
 ```
 
-
 ### Population Density
 
 
