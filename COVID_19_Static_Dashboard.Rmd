@@ -351,9 +351,23 @@ ggplot(cleaned_socioecon,
   theme(legend.position = "top")
 ```
 
-
 ### Death Rate
-
+```{r}
+# Plot death rate for all countries
+ggplot(cleaned_socioecon, 
+       aes(x = death_rate, y = reorder(country, death_rate), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Crude Death Rate per 1000 People by Country (2020-2022)",
+       x = "Crude Death Rate (per 1000 people)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 ### Annual Population Growth (%)
 
