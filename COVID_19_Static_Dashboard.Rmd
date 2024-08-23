@@ -14,6 +14,25 @@ library(httr)
 library(jsonlite)
 ```
 
+```{r COVID-19 Summary, include=FALSE}
+# Import data.
+COVID <- read.csv("WHO-COVID-19-global-table-data.csv")
+
+# The global stats for total cumulative cases and per 100k population and total cumulative deaths and per 100k population
+COVID_global <- COVID %>%
+  arrange(desc(Cases...cumulative.total)) %>% 
+  head(1)
+
+# Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population,
+# and Deaths...cumulative.total.per.100000.population and rename the variables.
+COVID_clean <- COVID %>% 
+  select(Name, WHO.Region, 
+         Cases.Cumulative.Per.100k = Cases...cumulative.total.per.100000.population, 
+         Deaths.Cumulative.Per.100k = Deaths...cumulative.total.per.100000.population)
+
+```
+
+
 Column {data-width=650}
 -----------------------------------------------------------------------
 
