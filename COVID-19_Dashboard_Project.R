@@ -528,3 +528,91 @@ socioecon_df_rpp <- socioecon_df_rpp %>%
 socioecon_df_rpp$rpp_grade <- factor(socioecon_df_rpp$rpp_grade, 
                                      levels = c("Very Low", "Low", "Medium", "High", "Very High"))
 
+# Create final data frame with average CFR and socioeconomic grades by country
+names(average_cfr)[1] <- "country"
+final_analysis_df <- average_cfr
+final_analysis_df <- average_cfr[,c(1,5)]
+final_analysis_df$pop_grade <- socioecon_df_pop$pop_grade
+final_analysis_df$pop_den_grade <- socioecon_df_pop_den$pop_den_grade
+final_analysis_df$gdp_grade <- socioecon_df_gdp$gdp_grade
+final_analysis_df$gni_grade <- socioecon_df_gni$gni_grade
+final_analysis_df$le_grade <- socioecon_df_le$le_grade
+final_analysis_df$br_grade <- socioecon_df_br$br_grade
+final_analysis_df$dr_grade <- socioecon_df_dr$dr_grade
+final_analysis_df$pgp_grade <- socioecon_df_pgp$pgp_grade
+final_analysis_df$upp_grade <- socioecon_df_upp$upp_grade
+final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
+
+# Attempting linear regression to find strongest predictor
+model <- lm(avg_cfr ~ pop_grade + pop_den_grade + gdp_grade + 
+              le_grade + $br_grade + dr_grade + pgp_grade + 
+              upp_grade + rpp_grade, data=final_analysis_df)
+summary(model)
+anova(model)
+#' Low sample size, leading to high multicollinearity, low variation 
+#' within groups and no residual degrees of freedom. Other analysis 
+#' required to find strongest predictor.
+
+#' Try linear regression using average CFR as the response and 
+#' socioeconomic indicators as continuous values, not grades. Create a new
+#' data frame for this.
+final_analysis_df_cont <- average_cfr
+final_analysis_df_cont <- average_cfr[,c(1,5)]
+final_analysis_df_cont$pop_values <- socioecon_df_pop$avg_values
+final_analysis_df_cont$pop_den_values <- socioecon_df_pop_den$avg_values
+final_analysis_df_cont$gdp_values <- socioecon_df_gdp$avg_values
+final_analysis_df_cont$gni_values <- socioecon_df_gni$avg_values
+final_analysis_df_cont$le_values <- socioecon_df_le$avg_values
+final_analysis_df_cont$br_values <- socioecon_df_br$avg_values
+final_analysis_df_cont$dr_values <- socioecon_df_dr$avg_values
+final_analysis_df_cont$pgp_values <- socioecon_df_pgp$avg_values
+final_analysis_df_cont$upp_values <- socioecon_df_upp$avg_values
+final_analysis_df_cont$rpp_values <- socioecon_df_rpp$avg_values
+
+model2 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               gni_values + le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+summary(model2)
+anova(model2)
+#' PGP has the largest coefficient magnitude, though significance unable 
+#' to be calculated. Another analysis required.
+
+#' Run correlation analysis using continous data, after removing country 
+#' name variable.
+final_analysis_df_cont <- final_analysis_df_cont[,-c(1)]
+
+install.packages("corrplot")
+library(corrplot)
+correlation_object <- cor(final_analysis_df_cont)
+corrplot(correlation_object, method = "number", tl.cex=0.5, 
+         number.cex = 0.5, type = "upper")
+#' Life expectancy has the largest magnitude correlation with average CFR,
+#' with population density as a close second.
+
+#' Run ANOVA on the strongest predictors to determine significance.
+anova_pop_den <- aov(avg_cfr ~ pop_grade, data = final_analysis_df)
+summary(anova_pop_den)
+
+anova_le <- aov(avg_cfr ~ le_grade, data = final_analysis_df)
+summary(anova_le)
+# Life expectancy has the lower p-value, though not significant.
+
+#' Graph the relationship between average CFR and life expectancy, 
+#' strongest predictor.
+install.packages("ggpubr")
+install.packages("ggplot2")
+library(ggpubr)
+library(ggplot2)
+boxplot_le <- ggboxplot(final_analysis_df, x = "le_grade", y = "avg_cfr", 
+                     color = "le_grade", palette = c("#00AFBB", "#E7B800", "#FC4E07", "lightgreen", "violet"),
+                     ylab = "Average CFR", xlab = "Life Expectancy Group", show.legend = FALSE)
+boxplot_le <- boxplot_le + theme(legend.position = "none")
+boxplot_le
+
+#' Graph the relationship between average CFR and population density, 
+#' second strongest predictor.
+boxplot_pop_den <- ggboxplot(final_analysis_df, x = "pop_den_grade", y = "avg_cfr", 
+                        color = "pop_den_grade", palette = c("#00AFBB", "#E7B800", "#FC4E07", "lightgreen", "violet"),
+                        ylab = "Average CFR", xlab = "Population Density Group", show.legend = FALSE)
+boxplot_pop_den <- boxplot_pop_den + theme(legend.position = "none")
+boxplot_pop_den
