@@ -456,7 +456,23 @@ ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)),
 ```
 
 ### GINI Index
+```{r}
 
+# Plot GINI index for all countries
+ggplot(cleaned_socioecon %>% filter(!is.na(gini)), 
+       aes(x = gini, 
+           y = reorder(country, gini), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "GINI Index by Country (2020-2022)",
+       x = "GINI Index",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 ### Literacy Rate
 
