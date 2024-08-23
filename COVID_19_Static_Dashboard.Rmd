@@ -269,12 +269,32 @@ ggplot(cleaned_socioecon,
   labs(title = "Population Total by Country (2020-2022)",
        x = "Total Population",
        y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
 
 ### Population Density
+```{r}
+# Plot population density for all countries
+# No population density for 2022.
+
+ggplot(cleaned_socioecon %>% filter(year != 2022), 
+       aes(x = pop_density, y = reorder(country, pop_density), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Population Density by Country (per sq. km) (2020-2021)",
+       x = "Population Density (per sq. km)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 
 ### Urban Population (%)
