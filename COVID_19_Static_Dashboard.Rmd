@@ -247,6 +247,8 @@ socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Rura
 
 # Cleaning up dataframe containing socioeconomic indicators such that each indicator has its own column.
 cleaned_socioecon <- pivot_wider(socioecon_df, id_cols = country:year, names_from = socioecon_indicator, values_from = value)
+cleaned_socioecon <- cleaned_socioecon %>%
+  arrange(country, year)
 
 ```
 
