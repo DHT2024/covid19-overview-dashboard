@@ -298,6 +298,22 @@ ggplot(cleaned_socioecon %>% filter(year != 2022),
 
 
 ### Urban Population (%)
+```{r}
+# Plot urban population % for all countries
+ggplot(cleaned_socioecon, 
+       aes(x = urban_pop, y = reorder(country, urban_pop), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Urban Population As a Percent of Population by Country (2020-2022)",
+       x = "Urban Population (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
 
 
 ### Rural population (%)
