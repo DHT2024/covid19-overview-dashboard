@@ -3,7 +3,16 @@ title: "COVID-19 Global Pandemic"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    vertical_layout: scroll   
+    vertical_layout: scroll
+    theme:
+        version: 4 
+        bg: "#F7F9FB"
+        fg: "#2A1B3D"
+        primary: "#25274D"
+        base_font:
+          google: Prompt
+        code_font:
+          google: JetBrains Mono   
 ---
 
 ```{r setup, include=FALSE}
@@ -37,7 +46,7 @@ COVID_clean <- COVID %>%
 COVID-19 Summary
 =======================================================================
 
-Row {data-height=140}
+Row {data-height=150}
 -----------------------------------------------------------------------
 ### COVID-19 Summary
 ```{r valueBox_summary}
@@ -762,7 +771,7 @@ average_mr$avg_mr_percent <- average_mr$avg_mr*100
 
 ```
 
-Row {data-height=440}
+Row {data-height=450}
 -----------------------------------------------------------------------
 ### COVID-19 Analysis Key Metrics
 ```{r valueBox_analysis}
