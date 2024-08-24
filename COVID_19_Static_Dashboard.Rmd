@@ -562,7 +562,7 @@ country_population_2020 <- cleaned_socioecon %>%
   filter(year %in% c("2020")) %>%
   arrange(country)
 
-country_population_2021 <- socioecon_df %>%
+country_population_2021 <- cleaned_socioecon %>%
   select(country, pop_total, year) %>%
   filter(year %in% c("2021")) %>% 
   arrange(country)
