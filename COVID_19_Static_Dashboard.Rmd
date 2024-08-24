@@ -14,6 +14,7 @@ library(httr)
 library(jsonlite)
 library(plotly)
 library(DT)
+library(fontawesome)
 ```
 
 ```{r COVID-19 Summary, include=FALSE}
@@ -254,12 +255,15 @@ cleaned_socioecon <- cleaned_socioecon %>%
 
 ```
 
-Row {data-height=50}
+Row {data-height=125}
 -----------------------------------------------------------------------
-```{r}
+### Population Indicator
+```{r valueboxes_pop_indicator}
 valueBox(value = "Population Indicators",
          caption = "Data from World Bank 2024.",
-         icon = "fa-solid fa-people-group",
+         icon = fa(
+           name="fa-solid fa-people-group",
+           file="#FFFFFF"),
          color = "#084b83")
 ```
 
