@@ -674,6 +674,56 @@ average_cfr <- average_cfr %>%
 average_cfr$avg_cfr_percent <- average_cfr$avg_cfr*100
 
 ```
+```{r}
+#### Mortality Rate ####
+# MR in 2020 = Confirmed Deaths (2020) / Population (2020)
+covid_mortality_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2020 = sum(New_deaths, na.rm = T))
+
+covid_mr_2020 <- covid_mortality_2020
+mr_2020 <- covid_mr_2020$deaths_2020 / country_population_2020$pop_total
+covid_mr_2020$population_2020 <- country_population_2020$pop_total
+covid_mr_2020$mr_2020 <- mr_2020
+covid_mr_2020$mr_2020_percent <- covid_mr_2020$mr_2020*100
+
+# MR in 2021 = Confirmed Deaths (2021) / Population (2021)
+covid_mortality_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2021 = sum(New_deaths, na.rm = T))
+
+covid_mr_2021 <- covid_mortality_2021
+mr_2021 <- covid_mr_2021$deaths_2021 / country_population_2021$pop_total
+covid_mr_2021$population_2021 <- country_population_2021$pop_total
+covid_mr_2021$mr_2021 <- mr_2021
+covid_mr_2021$mr_2021_percent <- covid_mr_2021$mr_2021*100
+
+# MR in 2022 = Confirmed Deaths (2022) / Population (2022)
+covid_mortality_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2022 = sum(New_deaths, na.rm = T))
+
+covid_mr_2022 <- covid_mortality_2022
+mr_2022 <- covid_mr_2022$deaths_2022 / country_population_2022$pop_total
+covid_mr_2022$population_2022 <- country_population_2022$pop_total
+covid_mr_2022$mr_2022 <- mr_2022
+covid_mr_2022$mr_2022_percent <- covid_mr_2022$mr_2022*100
+
+# Average MR over 2020-2022 = Avg()
+average_mr <- as.data.frame(covid_mr_2020$Country)
+average_mr$mr_2020 <- covid_mr_2020$mr_2020
+average_mr$mr_2021 <- covid_mr_2021$mr_2021
+average_mr$mr_2022 <- covid_mr_2022$mr_2022
+
+average_mr <- average_mr %>%
+  rename("Country" = "covid_mr_2020$Country") %>%
+  mutate(avg_mr = (mr_2020 + mr_2021 + mr_2022)/3)
+average_mr$avg_mr_percent <- average_mr$avg_mr*100
+
+```
 
 
 Row {.tabset .tabset-fade}
