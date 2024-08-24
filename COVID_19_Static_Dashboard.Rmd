@@ -547,7 +547,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)),
 
 COVID-19 Analysis: 2020-2022 Overview
 =======================================================================
-```{r}
+```{r, include = FALSE}
 # Import covid data with dates
 covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
 
@@ -623,8 +623,58 @@ average_prevalence <- average_prevalence %>%
   rename("Country" = "covid_prevalence_2020$Country") %>%
   mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
 average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*100
+```
+```{r, include=FALSE}
+#### Case Fatality Rate ####
+# CFR in 2020 = Confirmed Deaths (2020) / Confirmed Cases (2020)
+covid_deaths_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2020 = sum(New_cases, na.rm = T),
+            deaths_2020 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2020 <- covid_deaths_2020
+covid_cfr_2020$cfr_2020 <- covid_cfr_2020$deaths_2020 / covid_cfr_2020$cases_2020
+covid_cfr_2020$cfr_2020_percent <- covid_cfr_2020$cfr_2020*100
+View(covid_cfr_2020)
+
+# CFR in 2021 = Confirmed Deaths (2021) / Confirmed Cases (2021)
+covid_deaths_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2021 = sum(New_cases, na.rm = T),
+            deaths_2021 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2021 <- covid_deaths_2021
+covid_cfr_2021$cfr_2021 <- covid_cfr_2021$deaths_2021 / covid_cfr_2021$cases_2021
+covid_cfr_2021$cfr_2021_percent <- covid_cfr_2021$cfr_2021*100
+View(covid_cfr_2021)
+
+# CFR in 2022 = Confirmed Deaths (2022) / Confirmed Cases (2022)
+covid_deaths_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2022 = sum(New_cases, na.rm = T),
+            deaths_2022 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2022 <- covid_deaths_2022
+covid_cfr_2022$cfr_2022 <- covid_cfr_2022$deaths_2022 / covid_cfr_2022$cases_2022
+covid_cfr_2022$cfr_2022_percent <- covid_cfr_2022$cfr_2022*100
+View(covid_cfr_2022)
+
+# Average CFR over 2020-2022 = Avg()
+average_cfr <- as.data.frame(covid_cfr_2020$Country)
+average_cfr$cfr_2020 <- covid_cfr_2020$cfr_2020
+average_cfr$cfr_2021 <- covid_cfr_2021$cfr_2021
+average_cfr$cfr_2022 <- covid_cfr_2022$cfr_2022
+
+average_cfr <- average_cfr %>%
+  rename("Country" = "covid_cfr_2020$Country") %>%
+  mutate(avg_cfr = (cfr_2020 + cfr_2021 + cfr_2022)/3)
+average_cfr$avg_cfr_percent <- average_cfr$avg_cfr*100
 
 ```
+
 
 Row {.tabset .tabset-fade}
 -------------------------------------
@@ -651,7 +701,7 @@ ggplot(prevalence_long, aes(x = year,
                             color = Country)) +
   geom_line(linewidth = 1) +
   geom_point(size = 1) +
-  labs(title = "COVID-19 Prevalence Over Years",
+  labs(title = "COVID-19 Prevalence Over Years 2020-2022",
        x = "Year",
        y = "Prevalence",
        color = "Country") +
@@ -659,6 +709,34 @@ ggplot(prevalence_long, aes(x = year,
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+### Case Fatality Rate
+```{r, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+cfr_long <- average_cfr %>%
+  pivot_longer(cols = starts_with("cfr_"), 
+               names_to = "year", 
+               values_to = "cfr") %>%
+  mutate(year = case_when(
+    year == "cfr_2020" ~ "2020",
+    year == "cfr_2021" ~ "2021",
+    year == "cfr_2022" ~ "2022"
+  ),
+  cfr_percent = cfr*100)
+
+# Line plot for prevalence over years
+ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Case Fatality Rate Over Years 2020-2022",
+       x = "Year",
+       y = "Case Fatality Rate",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
 
 Row {.tabset .tabset-fade}
 -------------------------------------
@@ -675,7 +753,7 @@ avg_prev <- prevalence_long %>%
     "Average Prevalence" = avg_prevalence,
     "Average Prevalence (%)" = avg_prevalence_percent
   )
-datatable(avg_prev, options = list(pageLength = 4))
+datatable(avg_prev, options = list(pageLength = 6))
 ```
 
 Row
