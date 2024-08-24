@@ -636,7 +636,6 @@ covid_deaths_2020 <- covid_dates_countries_dates %>%
 covid_cfr_2020 <- covid_deaths_2020
 covid_cfr_2020$cfr_2020 <- covid_cfr_2020$deaths_2020 / covid_cfr_2020$cases_2020
 covid_cfr_2020$cfr_2020_percent <- covid_cfr_2020$cfr_2020*100
-View(covid_cfr_2020)
 
 # CFR in 2021 = Confirmed Deaths (2021) / Confirmed Cases (2021)
 covid_deaths_2021 <- covid_dates_countries_dates %>%
@@ -648,7 +647,6 @@ covid_deaths_2021 <- covid_dates_countries_dates %>%
 covid_cfr_2021 <- covid_deaths_2021
 covid_cfr_2021$cfr_2021 <- covid_cfr_2021$deaths_2021 / covid_cfr_2021$cases_2021
 covid_cfr_2021$cfr_2021_percent <- covid_cfr_2021$cfr_2021*100
-View(covid_cfr_2021)
 
 # CFR in 2022 = Confirmed Deaths (2022) / Confirmed Cases (2022)
 covid_deaths_2022 <- covid_dates_countries_dates %>%
@@ -660,7 +658,6 @@ covid_deaths_2022 <- covid_dates_countries_dates %>%
 covid_cfr_2022 <- covid_deaths_2022
 covid_cfr_2022$cfr_2022 <- covid_cfr_2022$deaths_2022 / covid_cfr_2022$cases_2022
 covid_cfr_2022$cfr_2022_percent <- covid_cfr_2022$cfr_2022*100
-View(covid_cfr_2022)
 
 # Average CFR over 2020-2022 = Avg()
 average_cfr <- as.data.frame(covid_cfr_2020$Country)
@@ -725,7 +722,6 @@ average_mr$avg_mr_percent <- average_mr$avg_mr*100
 
 ```
 
-
 Row {.tabset .tabset-fade}
 -------------------------------------
 ### Prevalence
@@ -782,6 +778,34 @@ ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country
   labs(title = "COVID-19 Case Fatality Rate Over Years 2020-2022",
        x = "Year",
        y = "Case Fatality Rate",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+### Mortality Rate
+```{r, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+mortality_long <- average_mr %>%
+  pivot_longer(cols = starts_with("mr_"), 
+               names_to = "year", 
+               values_to = "mr") %>%
+  mutate(year = case_when(
+    year == "mr_2020" ~ "2020",
+    year == "mr_2021" ~ "2021",
+    year == "mr_2022" ~ "2022"
+  ),
+  mr_percent = mr*100)
+
+# Line plot for prevalence over years
+ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Mortality Rate Over Years 2020-2022",
+       x = "Year",
+       y = "Mortality Rate",
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
