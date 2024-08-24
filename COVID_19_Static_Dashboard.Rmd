@@ -12,6 +12,8 @@ library(tidyverse)
 library(ggplot2)
 library(httr)
 library(jsonlite)
+library(plotly)
+library(DT)
 ```
 
 ```{r COVID-19 Summary, include=FALSE}
@@ -263,7 +265,7 @@ Row {.tabset .tabset-fade}
 ```{r}
 # Plot total population for all countries
 
-ggplot(cleaned_socioecon, 
+pop_tot_chart <- ggplot(cleaned_socioecon, 
        aes(x = pop_total, y = reorder(country, pop_total), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Population Total by Country (2020-2022)",
@@ -276,6 +278,7 @@ ggplot(cleaned_socioecon,
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(pop_tot_chart)
 ```
 
 ### Population Density
@@ -283,7 +286,7 @@ ggplot(cleaned_socioecon,
 # Plot population density for all countries
 # No population density for 2022.
 
-ggplot(cleaned_socioecon %>% filter(year != 2022), 
+pop_dens_chart <- ggplot(cleaned_socioecon %>% filter(year != 2022), 
        aes(x = pop_density, y = reorder(country, pop_density), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Population Density by Country (per sq. km) (2020-2021)",
@@ -294,6 +297,7 @@ ggplot(cleaned_socioecon %>% filter(year != 2022),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(pop_dens_chart)
 ```
 
 
@@ -301,7 +305,7 @@ ggplot(cleaned_socioecon %>% filter(year != 2022),
 ```{r}
 
 # Plot urban population % for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(urban_pop)), 
+urban_pop_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(urban_pop)), 
        aes(x = urban_pop, y = reorder(country, urban_pop), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Urban Population As a Percent of Population by Country (2020-2022)",
@@ -314,6 +318,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(urban_pop)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(urban_pop_chart)
 ```
 
 ### Rural population (%)
@@ -583,7 +588,6 @@ prevalence_2020 <- covid_dates_2020$cases_2020 / country_population_2020$pop_tot
 covid_prevalence_2020$population_2020 <- country_population_2020$pop_total
 covid_prevalence_2020$prevalence_2020 <- prevalence_2020
 covid_prevalence_2020$prevalence_2020_percent <- covid_prevalence_2020$prevalence_2020*100
-View(covid_prevalence_2020)
 
 # Prevalence in 2021 = Confirmed Cases (2021) / Population (2021)
 covid_dates_2021 <- covid_dates_countries_dates %>%
@@ -596,7 +600,6 @@ prevalence_2021 <- covid_dates_2021$cases_2021 / country_population_2021$pop_tot
 covid_prevalence_2021$population_2021 <- country_population_2021$pop_total
 covid_prevalence_2021$prevalence_2021 <- prevalence_2021
 covid_prevalence_2021$prevalence_2021_percent <- covid_prevalence_2021$prevalence_2021*100
-View(covid_prevalence_2021)
 
 # Prevalence in 2022 = Confirmed Cases (2022) / Population (2022)
 covid_dates_2022 <- covid_dates_countries_dates %>%
@@ -609,7 +612,6 @@ prevalence_2022 <- covid_dates_2022$cases_2022 / country_population_2022$pop_tot
 covid_prevalence_2022$population_2022 <- country_population_2022$pop_total
 covid_prevalence_2022$prevalence_2022 <- prevalence_2022
 covid_prevalence_2022$prevalence_2022_percent <- covid_prevalence_2022$prevalence_2022*100
-View(covid_prevalence_2022)
 
 # Average Prevalence over 2020-2022 = Avg()
 average_prevalence <- as.data.frame(covid_prevalence_2020$Country)
@@ -624,4 +626,74 @@ average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*1
 
 ```
 
+Row {.tabset .tabset-fade}
+-------------------------------------
+### Prevalence
 
+```{r, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+prevalence_long <- average_prevalence %>%
+  pivot_longer(cols = starts_with("prevalence_"), 
+               names_to = "year", 
+               values_to = "prevalence") %>%
+  mutate(year = case_when(
+    year == "prevalence_2020" ~ "2020",
+    year == "prevalence_2021" ~ "2021",
+    year == "prevalence_2022" ~ "2022"
+  ),
+  prevalence_percent = prevalence*100)
+
+# Line plot for prevalence over years
+ggplot(prevalence_long, aes(x = year, 
+                            y = prevalence_percent, 
+                            group = Country, 
+                            color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Prevalence Over Years",
+       x = "Year",
+       y = "Prevalence",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+### Average Prevalence
+```{r}
+avg_prev <- prevalence_long %>%
+  select(Country, avg_prevalence, avg_prevalence_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_prevalence = round(avg_prevalence, 4),
+    avg_prevalence_percent = round(avg_prevalence_percent, 4)
+  ) %>%
+  rename(
+    "Average Prevalence" = avg_prevalence,
+    "Average Prevalence (%)" = avg_prevalence_percent
+  )
+datatable(avg_prev, options = list(pageLength = 4))
+```
+
+Row
+-----------------------------------------
+### Case Fatality Rate Trend (2020-2022)
+
+Row
+-----------------------------------------
+### Average Case Fatality Rate (2020-2022)
+
+Row
+-----------------------------------------
+### Mortality Rate (2020-2022)
+
+Row
+-----------------------------------------
+### Average Mortality Rate (2020-2022)
+
+Row
+-----------------------------------------
+Data from World Bank 2024.
