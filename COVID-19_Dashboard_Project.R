@@ -339,10 +339,11 @@ socioecon_df_v2 <- socioecon_df %>%
   group_by(country, socioecon_id) %>%
   summarize(avg_values = mean(value, na.rm = T))
 
-# Extract demographic and socioeconomic indicator from World Bank API to create
-# a dataframe with data for all countries
-# To aid with setting thresholds
-# Build query
+#' Extract demographic/socioeconomic indicator from World Bank API to create
+#' a dataframe with data for all countries to aid with setting thresholds.
+#' Build query for 2 API calls, as calling API for all countries and all
+#' desired indicators is too large of a call. Two dataframes required  
+#' each with ~1/2 of desired indicators for all countries
 endpoint_all <- "/country"
 query_all_v2 <- "/indicator/SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
 # Combine all parts of the query to produce a call
@@ -545,7 +546,7 @@ final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
 
 # Attempting linear regression to find strongest predictor
 model <- lm(avg_cfr ~ pop_grade + pop_den_grade + gdp_grade + 
-              le_grade + $br_grade + dr_grade + pgp_grade + 
+              le_grade + br_grade + dr_grade + pgp_grade + 
               upp_grade + rpp_grade, data=final_analysis_df)
 summary(model)
 anova(model)
@@ -572,12 +573,25 @@ final_analysis_df_cont$rpp_values <- socioecon_df_rpp$avg_values
 model2 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
                gni_values + le_values + br_values + dr_values +
                pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
-summary(model2)
-anova(model2)
+plot(final_analysis_df_cont$avg_cfr,fitted(model2))
+#' Unable to plot due to NAs in GNI values. Remove GNI indicator from model 
+#' to correct this, as opposed to removing countries with NA GNI values.
+model3 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+#' Plotting the actual values of average CFR vs the fitted values from 
+#' the model
+plot(final_analysis_df_cont$avg_cfr,fitted(model3))
+# Plotting the above with ggplot and line of perfect fit (y=x)
+ggplot(final_analysis_df_cont, aes(x=avg_cfr, y=fitted(model3))) +
+  geom_point() + xlab("Average CFR") + ylab("Fitted Average CFR Values") +
+  geom_abline(slope=1)
+summary(model3)
+anova(model3)
 #' PGP has the largest coefficient magnitude, though significance unable 
 #' to be calculated. Another analysis required.
 
-#' Run correlation analysis using continous data, after removing country 
+#' Run correlation analysis using continuous data, after removing country 
 #' name variable.
 final_analysis_df_cont <- final_analysis_df_cont[,-c(1)]
 
