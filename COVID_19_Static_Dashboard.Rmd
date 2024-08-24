@@ -755,6 +755,32 @@ average_mr$avg_mr_percent <- average_mr$avg_mr*100
 
 ```
 
+Row {data-height=440}
+-----------------------------------------------------------------------
+### COVID-19 Analysis Key Metrics
+```{r valueBox_analysis}
+valueBox(
+  value = "COVID-19 Analysis: Key Metrics",
+  caption = 
+    paste0(
+      "This section provides an overview of the COVID-19 pandemic's impact across the 12 selected countries, specifically displaying the following critical metrics: prevalence, case fatality rate, and mortality rate. Each chart offers trends into the progression and effects of COVID-19 from 2020 to 2022.", 
+      "<br>",
+      "<br>",
+      "1. Prevalence: The prevalence chart displays the percentage of the population infected with COVID-19 each year. Notably, countries such as Austria and the Republic of Korea have shown significant spikes in prevalence, especially after the year 2021, indicating a sharp increase in COVID-19 cases. In contrast, a decrease in prevalence is noted in countries like Iran and Bosnia and Herzegovina. Meanwhile, other countries like Guyana and the Bahamas show a much flatter trend.",
+      "<br>",
+      "<br>",
+      "2. Case Fatality Rate (CFR): This chart illustrates the ratio of deaths to confirmed COVID-19 cases in percentages. Peru experienced a sharp decline after 2021, despite having the highest CFR among the 12 countries in 2020. A consistent decrease in CFR is noted in Peru, Iran, Germany, Austria, Cyprus, Republic of Korea, and Cuba. Whereas the remaining countries exhibited peaks in 2021, followed by a decline in 2022. Overall, all countries experienced a gradual decrease in CFR by 2022.",
+      "<br>",
+      "<br>",
+      "3. Mortality Rate: The mortality rate chart shows the proportion of deaths due to COVID-19 relative to the total population. Similar trends are observed with high mortality rates in Iran and Bosnia and Herzegovina during 2021, followed by a decline in 2022. While most countries had an overall reduced mortality rate by the end of 2022, Cyprus and Republic of Korea had an overall increased mortality rate. Other countries maintained relatively low and stable mortality rates over the three years.",
+      "<br>",
+      "<br>",
+      "You can interact with these plots by selecting individual countries for a focused view. Hovering over the chart lines provides precise numerical values for each metric."),
+  color = "#084b83"
+)
+
+```
+
 Row {.tabset .tabset-fade}
 -------------------------------------
 ### Prevalence
@@ -782,7 +808,7 @@ ggplotly(ggplot(prevalence_long, aes(x = year,
   geom_point(size = 1) +
   labs(title = "COVID-19 Prevalence Over Years 2020-2022",
        x = "Year",
-       y = "Prevalence",
+       y = "Prevalence (%)",
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -811,7 +837,7 @@ ggplotly(ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color 
   geom_point(size = 1) +
   labs(title = "COVID-19 Case Fatality Rate Over Years 2020-2022",
        x = "Year",
-       y = "Case Fatality Rate",
+       y = "Case Fatality Rate (%)",
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -840,13 +866,14 @@ ggplotly(ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, c
   geom_point(size = 1) +
   labs(title = "COVID-19 Mortality Rate Over Years 2020-2022",
        x = "Year",
-       y = "Mortality Rate",
+       y = "Mortality Rate (%)",
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 )
 
 ```
+
 
 Row {.tabset .tabset-fade}
 -------------------------------------
