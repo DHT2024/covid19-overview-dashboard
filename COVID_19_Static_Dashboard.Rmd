@@ -256,7 +256,12 @@ cleaned_socioecon <- cleaned_socioecon %>%
 
 Row {data-height=50}
 -----------------------------------------------------------------------
-**Population Indicators**
+```{r}
+valueBox(value = "Population Indicators",
+         caption = "Data from World Bank 2024.",
+         icon = "fa-solid fa-people-group",
+         color = "#084b83")
+```
 
 Row {.tabset .tabset-fade}
 -------------------------------------
