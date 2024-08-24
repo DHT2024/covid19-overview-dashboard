@@ -844,20 +844,21 @@ avg_cfr <- cfr_long %>%
   )
 datatable(avg_cfr, options = list(pageLength = 6))
 ```
-
-
-Row
------------------------------------------
-### Average Case Fatality Rate (2020-2022)
-
-Row
------------------------------------------
-### Mortality Rate (2020-2022)
-
-Row
------------------------------------------
-### Average Mortality Rate (2020-2022)
-
-Row
+### Average Mortality Rate
+```{r}
+avg_mortality <- mortality_long %>%
+  select(Country, avg_mr, avg_mr_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_mr = round(avg_mr, 4),
+    avg_mr_percent = round(avg_mr_percent, 4)
+  ) %>%
+  rename(
+    "Average Mortality Proportion" = avg_mr,
+    "Average Mortality (%)" = avg_mr_percent
+  )
+datatable(avg_mortality, options = list(pageLength = 6))
+```
+Row {data-height=50}
 -----------------------------------------
 Data from World Bank 2024.
