@@ -611,6 +611,17 @@ covid_prevalence_2022$prevalence_2022 <- prevalence_2022
 covid_prevalence_2022$prevalence_2022_percent <- covid_prevalence_2022$prevalence_2022*100
 View(covid_prevalence_2022)
 
+# Average Prevalence over 2020-2022 = Avg()
+average_prevalence <- as.data.frame(covid_prevalence_2020$Country)
+average_prevalence$prevalence_2020 <- covid_prevalence_2020$prevalence_2020
+average_prevalence$prevalence_2021 <- covid_prevalence_2021$prevalence_2021
+average_prevalence$prevalence_2022 <- covid_prevalence_2022$prevalence_2022
+
+average_prevalence <- average_prevalence %>%
+  rename("Country" = "covid_prevalence_2020$Country") %>%
+  mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
+average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*100
+
 ```
 
 
