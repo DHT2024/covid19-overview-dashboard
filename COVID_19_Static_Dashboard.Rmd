@@ -37,10 +37,17 @@ COVID_clean <- COVID %>%
 COVID-19 Summary
 =======================================================================
 
-Row {data-height=50}
+Row {data-height=140}
 -----------------------------------------------------------------------
+### COVID-19 Summary
+```{r valueBox_summary}
+valueBox(
+  value = "COVID-19 Analysis: Key Metrics",
+  caption = "The COVID-19 summary encompasses data from 241 countries, offering a comprehensive overview of the most recent reported numbers of COVID-19 cases and deaths, as sourced from the World Health Organization (WHO). This summary provides a global perspective on the pandemic's impact, highlighting the spread and mortality.",
+  color = "#374785"
+)
 
-The COVID-19 summary encompasses data from 241 countries, offering a comprehensive overview of the most recent reported numbers of COVID-19 cases and deaths, as sourced from the World Health Organization (WHO). This summary provides a global perspective on the pandemic's impact, highlighting the spread and mortality.
+```
 
 Row {data-height=125}
 -----------------------------------------------------------------------
