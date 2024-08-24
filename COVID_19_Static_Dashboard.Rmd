@@ -3,7 +3,7 @@ title: "COVID-19 Global Pandemic"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    vertical_layout: scroll
+    vertical_layout: scroll   
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +14,6 @@ library(httr)
 library(jsonlite)
 library(plotly)
 library(DT)
-library(fontawesome)
 ```
 
 ```{r COVID-19 Summary, include=FALSE}
@@ -52,7 +51,7 @@ Row {data-height=125}
 valueBox(value = "775,867,542",
          caption = "Total Global Cases",
          icon = "ion-thermometer",
-         color = "#b3cde0")
+         color = "#084b83")
 
 ```
 
@@ -62,7 +61,7 @@ valueBox(value = "775,867,542",
 valueBox(value = "4,798,837",
          caption = "Total Global Cases per 100k Population",
          icon = "ion-thermometer",
-         color = "#b3cde0")
+         color = "#084b83")
 
 ```
 
@@ -126,7 +125,7 @@ Row {data-height=125}
 valueBox(value = "7,057,145",
          caption = "Total Global Deaths",
          icon = "ion-alert-circled",
-         color = "#b3cde0")
+         color = "#084b83")
 
 ```
 
@@ -136,7 +135,7 @@ valueBox(value = "7,057,145",
 valueBox(value = "29,394",
          caption = "Total Global Deaths per 100k Population",
          icon = "ion-alert-circled",
-         color = "#b3cde0")
+         color = "#084b83")
 
 ```
 
@@ -261,9 +260,7 @@ Row {data-height=125}
 ```{r valueboxes_pop_indicator}
 valueBox(value = "Population Indicators",
          caption = "Data from World Bank 2024.",
-         icon = fa(
-           name="fa-solid fa-people-group",
-           file="#FFFFFF"),
+         icon = "fas fa-people-group",
          color = "#084b83")
 ```
 
@@ -271,7 +268,7 @@ Row {.tabset .tabset-fade}
 -------------------------------------
 
 ### Total Population
-```{r}
+```{r total population plot}
 # Plot total population for all countries
 
 pop_tot_chart <- ggplot(cleaned_socioecon, 
@@ -291,7 +288,7 @@ ggplotly(pop_tot_chart)
 ```
 
 ### Population Density
-```{r}
+```{r population density plot}
 # Plot population density for all countries
 # No population density for 2022.
 
@@ -311,7 +308,7 @@ ggplotly(pop_dens_chart)
 
 
 ### Urban Population (%)
-```{r}
+```{r urban population plot}
 
 # Plot urban population % for all countries
 urban_pop_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(urban_pop)), 
@@ -331,7 +328,7 @@ ggplotly(urban_pop_chart)
 ```
 
 ### Rural population (%)
-```{r}
+```{r rural population plot}
 
 # Plot rural population % for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)), 
@@ -350,7 +347,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)),
 ```
 
 ### Birth Rate
-```{r}
+```{r birth rate plot}
 
 # Plot birth rate for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)), 
@@ -369,7 +366,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)),
 ```
 
 ### Death Rate
-```{r}
+```{r death rate plot}
 
 # Plot death rate for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)), 
@@ -388,7 +385,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)),
 ```
 
 ### Annual Population Growth (%)
-```{r}
+```{r annual pop growth plot}
 
 # Plot annual population growth for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)), 
@@ -406,15 +403,21 @@ ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)),
   theme(legend.position = "top")
 ```
 
-Row {data-height=50}
+Row {data-height=125}
 -----------------------------------------------------------------------
-**Economic Indicators**
+### Economic Indicator
+```{r valueboxes_economic_indicator}
+valueBox(value = "Economic Indicators",
+         caption = "Data from World Bank 2024.",
+         icon ="fas fa-sack-dollar",
+         color = "#084b83")
+```
 
 Row {.tabset .tabset-fade}
 -------------------------------------
 
 ### GDP (current USD)
-```{r}
+```{r gdp plot}
 
 # Plot GDP for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(gdp)), 
@@ -433,7 +436,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gdp)),
 ```
 
 ### GNI (current USD)
-```{r}
+```{r gni plot}
 
 # Plot GNI for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(gni)), 
@@ -452,7 +455,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gni)),
 ```
 
 ### Adjusted Net National Income per Capita (current USD)
-```{r}
+```{r net income plot}
 
 # Plot Net National Income Per Capita for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)), 
@@ -472,7 +475,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)),
 ```
 
 ### Poverty Headcount Ratio
-```{r}
+```{r poverty headcount plot}
 
 # Plot poverty headcount ratio for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)), 
@@ -498,7 +501,7 @@ Row {.tabset .tabset-fade}
 -------------------------------------
 
 ### Life Expectancy 
-```{r}
+```{r life expectancy plot}
 
 # Plot life expectancy for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)), 
@@ -517,7 +520,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)),
 ```
 
 ### GINI Index
-```{r}
+```{r gini index plot}
 
 # Plot GINI index for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(gini)), 
@@ -536,7 +539,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gini)),
 ```
 
 ### Literacy Rate
-```{r}
+```{r literacy rate plot}
 
 # Plot literacy rate for all countries
 ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)), 
@@ -556,7 +559,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)),
 
 COVID-19 Analysis: 2020-2022 Overview
 =======================================================================
-```{r, include = FALSE}
+```{r prevalence calculation, include = FALSE}
 # Import covid data with dates
 covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
 
@@ -633,7 +636,7 @@ average_prevalence <- average_prevalence %>%
   mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
 average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*100
 ```
-```{r, include=FALSE}
+```{r CFR calculation, include=FALSE}
 #### Case Fatality Rate ####
 # CFR in 2020 = Confirmed Deaths (2020) / Confirmed Cases (2020)
 covid_deaths_2020 <- covid_dates_countries_dates %>%
@@ -680,7 +683,7 @@ average_cfr <- average_cfr %>%
 average_cfr$avg_cfr_percent <- average_cfr$avg_cfr*100
 
 ```
-```{r}
+```{r Mortality Rate calculation}
 #### Mortality Rate ####
 # MR in 2020 = Confirmed Deaths (2020) / Population (2020)
 covid_mortality_2020 <- covid_dates_countries_dates %>%
@@ -735,7 +738,7 @@ Row {.tabset .tabset-fade}
 -------------------------------------
 ### Prevalence
 
-```{r, fig.width=10, fig.height=5}
+```{r, prevalence, fig.width=10, fig.height=5}
 
 # Reshape data to long format for plotting
 prevalence_long <- average_prevalence %>%
@@ -766,7 +769,7 @@ ggplot(prevalence_long, aes(x = year,
 ```
 
 ### Case Fatality Rate
-```{r, fig.width=10, fig.height=5}
+```{r, cfr, fig.width=10, fig.height=5}
 
 # Reshape data to long format for plotting
 cfr_long <- average_cfr %>%
@@ -794,7 +797,7 @@ ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country
 ```
 
 ### Mortality Rate
-```{r, fig.width=10, fig.height=5}
+```{r, mr, fig.width=10, fig.height=5}
 
 # Reshape data to long format for plotting
 mortality_long <- average_mr %>%
@@ -824,7 +827,7 @@ ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Co
 Row {.tabset .tabset-fade}
 -------------------------------------
 ### Average Prevalence
-```{r}
+```{r average prevalence}
 avg_prev <- prevalence_long %>%
   select(Country, avg_prevalence, avg_prevalence_percent) %>%
   distinct() %>%
@@ -839,7 +842,7 @@ avg_prev <- prevalence_long %>%
 datatable(avg_prev, options = list(pageLength = 6))
 ```
 ### Average Case Fatality Rate
-```{r}
+```{r average cfr}
 avg_cfr <- cfr_long %>%
   select(Country, avg_cfr, avg_cfr_percent) %>%
   distinct() %>%
@@ -854,7 +857,7 @@ avg_cfr <- cfr_long %>%
 datatable(avg_cfr, options = list(pageLength = 6))
 ```
 ### Average Mortality Rate
-```{r}
+```{r average mortality rate}
 avg_mortality <- mortality_long %>%
   select(Country, avg_mr, avg_mr_percent) %>%
   distinct() %>%
