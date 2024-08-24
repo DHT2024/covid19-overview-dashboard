@@ -83,13 +83,14 @@ COVID_high_spread <- COVID_high_spread %>%
   filter(Name %in% c("Cyprus", "Austria", "Republic of Korea"))
 
 # Plot the countries with one of the highest number of total cases per 100k population. 
-ggplot(COVID_high_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
+ggplotly(ggplot(COVID_high_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
   geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "High Spread Countries",
        x = "Country",
        y = "Cumulative Cases Per 100K Population") +
   ylim(0, 80000) +
   theme_minimal()
+  )
 ```
 
 ### Low Spread Countries
@@ -107,13 +108,14 @@ COVID_low_spread <- COVID_low_spread %>%
   filter(Name %in% c("Cuba", "Guyana", "Iran (Islamic Republic of)"))
 
 # Plot the countries with <10k total cases per 100k population.
-ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
+ggplotly(ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
   geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "Low Spread Countries",
        x = "Country",
        y = "Cumulative Cases Per 100K Population") +
   ylim(0, 80000) +
   theme_minimal()
+)
 ```
 
 Row {data-height=125}
@@ -157,13 +159,14 @@ COVID_high_mortality <- COVID_high_mortality %>%
   filter(Name %in% c("Peru", "Hungary", "Bosnia and Herzegovina"))
 
 # Plot the countries with one of the highest number of total death per 100k population. 
-ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+ggplotly(ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "High Mortality Countries",
        x = "Country",
        y = "Cumulative Deaths Per 100K Population") +
   ylim(0, 800) +
   theme_minimal()
+)
 ```
 
 ### Low Mortality Countries 
@@ -182,13 +185,14 @@ COVID_low_mortality <- COVID_low_mortality %>%
   filter(Name %in% c("Guam", "Bahamas", "Germany"))
 
 # Plot the countries with <10k total death per 100k population.
-ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+ggplotly(ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
   geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "Low Mortality Countries",
        x = "Country",
        y = "Cumulative Deaths Per 100K Population") +
   ylim(0, 800) +
   theme_minimal()
+)
 ```
 
 Country Indicators
@@ -331,7 +335,7 @@ ggplotly(urban_pop_chart)
 ```{r rural population plot}
 
 # Plot rural population % for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)), 
+rural_pop_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)), 
        aes(x = rural_pop, y = reorder(country, rural_pop), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Rural Population As a Percent of Population by Country (2020-2022)",
@@ -344,13 +348,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(rural_pop_chart)
 ```
 
 ### Birth Rate
 ```{r birth rate plot}
 
 # Plot birth rate for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)), 
+birth_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)), 
        aes(x = birth_rate, y = reorder(country, birth_rate), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Crude Birth Rate per 1000 People by Country (2020-2022)",
@@ -363,13 +368,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(birth_chart)
 ```
 
 ### Death Rate
 ```{r death rate plot}
 
 # Plot death rate for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)), 
+death_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)), 
        aes(x = death_rate, y = reorder(country, death_rate), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Crude Death Rate per 1000 People by Country (2020-2022)",
@@ -382,13 +388,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(death_chart)
 ```
 
 ### Annual Population Growth (%)
 ```{r annual pop growth plot}
 
 # Plot annual population growth for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)), 
+annual_pop_growth_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)), 
        aes(x = pop_growth, y = reorder(country, pop_growth), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Annual Population Growth by Country (2020-2022)",
@@ -401,6 +408,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(annual_pop_growth_chart)
 ```
 
 Row {data-height=125}
@@ -420,7 +428,7 @@ Row {.tabset .tabset-fade}
 ```{r gdp plot}
 
 # Plot GDP for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(gdp)), 
+gdp_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gdp)), 
        aes(x = gdp, 
            y = reorder(country, gdp), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -433,13 +441,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gdp)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(gdp_chart)
 ```
 
 ### GNI (current USD)
 ```{r gni plot}
 
 # Plot GNI for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(gni)), 
+gni_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gni)), 
        aes(x = gni, 
            y = reorder(country, gni), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -452,13 +461,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gni)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(gni_chart)
 ```
 
 ### Adjusted Net National Income per Capita (current USD)
 ```{r net income plot}
 
 # Plot Net National Income Per Capita for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)), 
+net_income_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)), 
        aes(x = national_income_capita / 1e3, 
            y = reorder(country, national_income_capita), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -472,13 +482,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)),
   scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(net_income_chart)
 ```
 
 ### Poverty Headcount Ratio
 ```{r poverty headcount plot}
 
 # Plot poverty headcount ratio for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)), 
+poverty_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)), 
        aes(x = poverty_ratio, 
            y = reorder(country, poverty_ratio), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -491,6 +502,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(poverty_chart)
 ```
 
 Row {data-height=125}
@@ -510,7 +522,7 @@ Row {.tabset .tabset-fade}
 ```{r life expectancy plot}
 
 # Plot life expectancy for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)), 
+life_expectancy_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)), 
        aes(x = life_expectancy, 
            y = reorder(country, life_expectancy), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -523,13 +535,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(life_expectancy_chart)
 ```
 
 ### GINI Index
 ```{r gini index plot}
 
 # Plot GINI index for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(gini)), 
+gini_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gini)), 
        aes(x = gini, 
            y = reorder(country, gini), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -542,13 +555,14 @@ ggplot(cleaned_socioecon %>% filter(!is.na(gini)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(gini_chart)
 ```
 
 ### Literacy Rate
 ```{r literacy rate plot}
 
 # Plot literacy rate for all countries
-ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)), 
+literacy_rate_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)), 
        aes(x = literacy_rate, 
            y = reorder(country, literacy_rate), fill = year)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -561,6 +575,7 @@ ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)),
                      name = "Year") +
   theme_minimal() +
   theme(legend.position = "top")
+ggplotly(literacy_rate_chart)
 ```
 
 COVID-19 Analysis: 2020-2022 Overview
@@ -759,7 +774,7 @@ prevalence_long <- average_prevalence %>%
   prevalence_percent = prevalence*100)
 
 # Line plot for prevalence over years
-ggplot(prevalence_long, aes(x = year, 
+ggplotly(ggplot(prevalence_long, aes(x = year, 
                             y = prevalence_percent, 
                             group = Country, 
                             color = Country)) +
@@ -771,6 +786,7 @@ ggplot(prevalence_long, aes(x = year,
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
 
 ```
 
@@ -790,7 +806,7 @@ cfr_long <- average_cfr %>%
   cfr_percent = cfr*100)
 
 # Line plot for prevalence over years
-ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country)) +
+ggplotly(ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country)) +
   geom_line(linewidth = 1) +
   geom_point(size = 1) +
   labs(title = "COVID-19 Case Fatality Rate Over Years 2020-2022",
@@ -799,6 +815,7 @@ ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
 
 ```
 
@@ -818,7 +835,7 @@ mortality_long <- average_mr %>%
   mr_percent = mr*100)
 
 # Line plot for prevalence over years
-ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Country)) +
+ggplotly(ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Country)) +
   geom_line(linewidth = 1) +
   geom_point(size = 1) +
   labs(title = "COVID-19 Mortality Rate Over Years 2020-2022",
@@ -827,6 +844,7 @@ ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Co
        color = "Country") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
 
 ```
 
