@@ -709,6 +709,7 @@ ggplot(prevalence_long, aes(x = year,
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ### Case Fatality Rate
 ```{r, fig.width=10, fig.height=5}
 
@@ -737,7 +738,6 @@ ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country
 
 ```
 
-
 Row {.tabset .tabset-fade}
 -------------------------------------
 ### Average Prevalence
@@ -750,15 +750,27 @@ avg_prev <- prevalence_long %>%
     avg_prevalence_percent = round(avg_prevalence_percent, 4)
   ) %>%
   rename(
-    "Average Prevalence" = avg_prevalence,
+    "Average Prevalence Proportion" = avg_prevalence,
     "Average Prevalence (%)" = avg_prevalence_percent
   )
 datatable(avg_prev, options = list(pageLength = 6))
 ```
+### Average Case Fatality Rate
+```{r}
+avg_cfr <- cfr_long %>%
+  select(Country, avg_cfr, avg_cfr_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_cfr = round(avg_cfr, 4),
+    avg_cfr_percent = round(avg_cfr_percent, 4)
+  ) %>%
+  rename(
+    "Average Case Fatality Proportion" = avg_cfr,
+    "Average Case Fatality (%)" = avg_cfr_percent
+  )
+datatable(avg_cfr, options = list(pageLength = 6))
+```
 
-Row
------------------------------------------
-### Case Fatality Rate Trend (2020-2022)
 
 Row
 -----------------------------------------
