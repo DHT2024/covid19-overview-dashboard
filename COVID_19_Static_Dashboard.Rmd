@@ -84,7 +84,7 @@ COVID_high_spread <- COVID_high_spread %>%
 
 # Plot the countries with one of the highest number of total cases per 100k population. 
 ggplot(COVID_high_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
-  geom_bar(stat = "identity", fill = "#005b96") +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "High Spread Countries",
        x = "Country",
        y = "Cumulative Cases Per 100K Population") +
@@ -108,7 +108,7 @@ COVID_low_spread <- COVID_low_spread %>%
 
 # Plot the countries with <10k total cases per 100k population.
 ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
-  geom_bar(stat = "identity", fill = "#005b96") +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "Low Spread Countries",
        x = "Country",
        y = "Cumulative Cases Per 100K Population") +
@@ -158,7 +158,7 @@ COVID_high_mortality <- COVID_high_mortality %>%
 
 # Plot the countries with one of the highest number of total death per 100k population. 
 ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
-  geom_bar(stat = "identity", fill = "#005b96") +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "High Mortality Countries",
        x = "Country",
        y = "Cumulative Deaths Per 100K Population") +
@@ -183,7 +183,7 @@ COVID_low_mortality <- COVID_low_mortality %>%
 
 # Plot the countries with <10k total death per 100k population.
 ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
-  geom_bar(stat = "identity", fill = "#005b96") +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
   labs(title = "Low Mortality Countries",
        x = "Country",
        y = "Cumulative Deaths Per 100K Population") +
@@ -493,9 +493,15 @@ ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)),
   theme(legend.position = "top")
 ```
 
-Row {data-height=50}
+Row {data-height=125}
 -----------------------------------------------------------------------
-**Social Indicators**
+### Social Indicator
+```{r valueboxes_social_indicator}
+valueBox(value = "Social Indicators",
+         caption = "Data from World Bank 2024.",
+         icon ="fas fa-network-wired",
+         color = "#084b83")
+```
 
 Row {.tabset .tabset-fade}
 -------------------------------------
