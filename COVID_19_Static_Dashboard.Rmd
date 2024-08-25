@@ -25,6 +25,7 @@ library(plotly)
 library(DT)
 library(pander)
 library(corrplot)
+library(ggpubr)
 
 ```
 
@@ -1167,13 +1168,13 @@ valueBox(
   value = "Indicator of COVID-19 Case Fatality Rate (CFR) Analysis",
   caption = 
     paste0(
-      "This section aims to analyze the relationship between COVID-19 case fatality rates (CFR) and various socioeconomics indictors. Relevant demographic and socioeconomic data include indicators such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
+      "This section explores the relationship between COVID-19 case fatality rates (CFR) and a range of socioeconomic indicators. The demographic and socioeconomic data analyzed include metrics such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
       "<br>",
       "<br>",
-      "The extracted data was organized into comprehensive dataframe covering all 12 countries. Two versions of the dataframe were used for analysis: (1) a dataframe consisting of the average value of each indicator from 2020 to 2022 for each country and (2) a graded dataframe of the indicators. The graded dataframe consisted of dividing the values of each indicator into quantiles, creating thresholds categorized as \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\" based on their respective indicator values.",
+      "The data was compiled into a comprehensive dataframe encompassing all 12 countries studied. Two versions of the dataframe were utilized for the analysis: (1) a dataframe containing the average value of each indicator from 2020 to 2022 for each country (continuous), and (2) a categorized dataframe in which indicator values were divided into quantiles and assigned to categories labeled \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\". The quantiles were determined at the 0.2, 0.4, 0.6, and 0.8 thresholds.",
        "<br>",
       "<br>",
-      "You can interact with these plots by hovering over the chart lines provides precise numerical values for each metric."),
+      "A significance level of 0.05 was applied in the analysis."),
   color = "#374785"
 )
 ```
@@ -1187,14 +1188,13 @@ valueBox(
   value = "Linear Regression Model",
   caption = 
     paste0(
-      "A linear regression model was used to find a strongest predictor against the (1) a dataframe consisting of the average value of each indicator from 2020 to 2022 for each country and (2) a graded dataframe of the indicators.", 
+      "A linear regression model was employed to identify the strongest predictor using two different dataframes: (1) a dataframe containing the average value of each indicator from 2020 to 2022 for each country, and (2) a categorized dataframe with indicators divided into quantiles.", 
       "<br>",
       "<br>",
-      "The (2) linear regression model had a low sample size for each grade, leading to high multicollinearity. It had low varaition within groups and no residual degrees of freedom. Therefore, a linear regression model was tested on (1) and the following results is shown below. The PGP (population growth) has the largest coefficient magnitude, although the significance was unable to be calculated. Another analysis is required."),
+      "The linear regression model applied to the categorized dataframe faced challenges due to the small sample size within each category, leading to high multicollinearity, low variation within groups, and no residual degrees of freedom. As a result, the model was tested on the continuous dataframe (1), and the following results are presented below. Population growth (PGP) exhibited the largest coefficient magnitude, although the p-value was not significant. Further analysis is needed."),
   color = "#084b83"
 )
 ```
-
 
 ```{r linear_regression}
 # Attempting linear regression to find strongest predictor
@@ -1255,10 +1255,10 @@ pander(model3)
 #' the model
 #plot(final_analysis_df_cont$avg_cfr,fitted(model3))
 # Plotting the above with ggplot and line of perfect fit (y=x)
-ggplot(final_analysis_df_cont, aes(x=avg_cfr, y=fitted(model3))) +
+ggplotly(ggplot(final_analysis_df_cont, aes(x=avg_cfr, y=fitted(model3))) +
   geom_point() + xlab("Average CFR") + ylab("Fitted Average CFR Values") +
   geom_abline(slope=1) +
-  theme_minimal()
+  theme_minimal())
 ```
 
 
@@ -1271,7 +1271,7 @@ valueBox(
   value = "Correlation",
   caption = 
     paste0(
-      "Using the first (1) dataframe consisting of the average value of each indicator (continuous)from 2020 to 2022 for each country, a correlation analysis was done against all the predictor and response variables as shown below. Life expectancy has the largest magnitude correlation with average CFR, with population density as a close second."),
+      "Utilizing the first dataframe (1), which consists of the average value of each indicator (continuous) from 2020 to 2022 for each country, a correlation analysis was conducted between all predictor and response variables. Life expectancy showed the strongest correlation with average CFR, followed closely by population density."),
   color = "#084b83"
 )
 ```
@@ -1292,36 +1292,66 @@ corrplot(correlation_object, method = "number", tl.cex=0.5,
 #' with population density as a close second.
 ```
 
+Row {data-height= 150}
+-----------------------------------------------------------------------
+### Top Indicators
+
+```{r valueBox_ANOVA}
+valueBox(
+  value = "ANOVA and Relationship between The Top Indicators and CFR",
+  caption = 
+    paste0(
+      "ANOVA was performed using dataset (2) to determine whether the mean CFR differs across country categories based on selected indicators. The indicators chosen for this analysis were life expectancy and population density. Although life expectancy had a lower p-value than population density, neither was statistically significant. The relationship between average CFR and these indicators is illustrated below. The results indicate a higher average CFR in countries classified as having very low population density and medium-level life expectancy."),
+  color = "#084b83"
+)
+```
+
+Row {data-height=175}
+-----------------------------------------------------------------------
+### ANOVA - Population Density
+
+```{r ANOVA_pop_den}
+#' Run ANOVA on the strongest predictors to determine significance.
+#' Population density
+anova_pop_den <- aov(avg_cfr ~ pop_grade, data = final_analysis_df)
+pander(anova_pop_den)
+
+```
+
+### ANOVA - Life Expectancy
+
+```{r ANOVA_le}
+# Run ANOVA on the strongest predictors to determine significance.
+# Life expectancy
+anova_le <- aov(avg_cfr ~ le_grade, data = final_analysis_df)
+pander(anova_le)
+# Life expectancy has the lower p-value, though not significant.
+```
+
 Row {data-height=450}
 -----------------------------------------------------------------------
 
-### L
+### Relationship Between Population Density and CFR
 
-```{r indicators}
-
-
+```{r population_density}
+#' Graph the relationship between average CFR and population density, 
+#' second strongest predictor.
+boxplot_pop_den <- ggboxplot(final_analysis_df, x = "pop_den_grade", y = "avg_cfr", 
+                             color = "pop_den_grade", palette = c("#011f4b", "#03396c", "#005b96", "#6497b1", "#b3cde0"),
+                             ylab = "Average CFR", xlab = "Population Density Group", show.legend = FALSE)
+boxplot_pop_den <- boxplot_pop_den + theme(legend.position = "none")
+boxplot_pop_den
 ```
 
-### Lv
+### Relationship Between Life Expectancy and CFR
 
-```{r indicator}
-
+```{r life_expectancy}
+#' Graph the relationship between average CFR and life expectancy, 
+#' strongest predictor.
+boxplot_le <- ggboxplot(final_analysis_df, x = "le_grade", y = "avg_cfr", 
+                        color = "le_grade", palette = c("#011f4b", "#03396c", "#005b96", "#6497b1", "#b3cde0"),
+                        ylab = "Average CFR", xlab = "Life Expectancy Group", show.legend = FALSE)
+boxplot_le <- boxplot_le + theme(legend.position = "none")
+boxplot_le
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
