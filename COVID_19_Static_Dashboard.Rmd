@@ -1168,7 +1168,7 @@ valueBox(
   value = "Indicator of COVID-19 Case Fatality Rate (CFR) Analysis",
   caption = 
     paste0(
-      "This section explores the relationship between COVID-19 case fatality rates (CFR) and a range of socioeconomic indicators. The demographic and socioeconomic data analyzed include metrics such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
+      "This section explores the relationship between COVID-19 case fatality rates (CFR) and a range of socioeconomic indicators. The demographic and socioeconomic data analyzed from World Bank (2024) include metrics such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
       "<br>",
       "<br>",
       "The data was compiled into a comprehensive dataframe encompassing all 12 countries studied. Two versions of the dataframe were utilized for the analysis: (1) a dataframe containing the average value of each indicator from 2020 to 2022 for each country (continuous), and (2) a categorized dataframe in which indicator values were divided into quantiles and assigned to categories labeled \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\". The quantiles were determined at the 0.2, 0.4, 0.6, and 0.8 thresholds.",
