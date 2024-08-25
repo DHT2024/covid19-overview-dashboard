@@ -796,7 +796,7 @@ valueBox(
       "<br>",
       "<br>",
       "You can interact with these plots by selecting individual countries for a focused view. Hovering over the chart lines provides precise numerical values for each metric."),
-  color = "#374785"
+  color = "#374785",
 )
 
 ```
@@ -1159,7 +1159,7 @@ final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
 
 ```
 
-Row {data-height=275}
+Row {data-height=290}
 -----------------------------------------------------------------------
 ### Indicators of COVID-19 Case Fatality Rate
 
@@ -1175,6 +1175,8 @@ valueBox(
        "<br>",
       "<br>",
       "A significance level of 0.05 was applied in the analysis."),
+      "<br>",
+      "<br>",
   color = "#374785"
 )
 ```
@@ -1355,3 +1357,30 @@ boxplot_le <- boxplot_le + theme(legend.position = "none")
 boxplot_le
 ```
 
+About
+=======================================================================
+Row {data-height=350}
+-----------------------------------------------------------------------
+
+### About
+```{r valueBox}
+valueBox(
+  value = "About",
+  caption = 
+    paste0(
+      "COVID-19 data sourced from World Health Organization (WHO) database.", 
+       "<br>",
+       "<br>",
+"Global socio-economic data sourced from World Bank Indicators API v2.",
+       "<br>",
+       "<br>",
+"All icons sourced from Font Awesome.",
+       "<br>",
+       "<br>",
+"Threshold values for the select countries were determined by identifying the quantile values (0.2, 0.4, 0.6, and 0.8) for each indicator based on global data. Thresholds were set at these values to ensure that the select countries were grouped relative to all available indicator data sourced from countries around the world.",
+       "<br>",
+       "<br>",
+      "**INSERT REFERENCES**"),
+  color = "#084b83",
+)
+```
