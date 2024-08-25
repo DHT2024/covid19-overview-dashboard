@@ -23,6 +23,9 @@ library(httr)
 library(jsonlite)
 library(plotly)
 library(DT)
+library(pander)
+library(corrplot)
+
 ```
 
 ```{r COVID-19 Summary, include=FALSE}
@@ -1153,18 +1156,10 @@ final_analysis_df$pgp_grade <- socioecon_df_pgp$pgp_grade
 final_analysis_df$upp_grade <- socioecon_df_upp$upp_grade
 final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
 
-# Attempting linear regression to find strongest predictor
-model <- lm(avg_cfr ~ pop_grade + pop_den_grade + gdp_grade + 
-              le_grade + br_grade + dr_grade + pgp_grade + 
-              upp_grade + rpp_grade, data=final_analysis_df)
-#summary(model)
-#anova(model)
-#' Low sample size, leading to high multicollinearity, low variation 
-#' within groups and no residual degrees of freedom. Other analysis 
-#' required to find strongest predictor.
-
 ```
 
+Row {data-height=275}
+-----------------------------------------------------------------------
 ### Indicators of COVID-19 Case Fatality Rate
 
 ```{r valueBox_indicators}
@@ -1175,13 +1170,157 @@ valueBox(
       "This section aims to analyze the relationship between COVID-19 case fatality rates (CFR) and various socioeconomics indictors. Relevant demographic and socioeconomic data include indicators such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
       "<br>",
       "<br>",
-      "The extracted data was organized into comprehensive dataframe covering all 12 countries. Two versions of the dataframe were used for analysis: (1) the original dataframe and (2) a graded dataframe of the indicators. The graded dataframe consisted of dividing the values of each indicator into quantiles, creating thresholds categorized as \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\" based on their respective indicator values.",
+      "The extracted data was organized into comprehensive dataframe covering all 12 countries. Two versions of the dataframe were used for analysis: (1) a dataframe consisting of the average value of each indicator from 2020 to 2022 for each country and (2) a graded dataframe of the indicators. The graded dataframe consisted of dividing the values of each indicator into quantiles, creating thresholds categorized as \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\" based on their respective indicator values.",
        "<br>",
       "<br>",
       "You can interact with these plots by hovering over the chart lines provides precise numerical values for each metric."),
   color = "#374785"
 )
 ```
+
+Row {data-height=225}
+-----------------------------------------------------------------------
+### Linear Regression Models
+
+```{r valueBox_linear_regression}
+valueBox(
+  value = "Linear Regression Model",
+  caption = 
+    paste0(
+      "A linear regression model was used to find a strongest predictor against the (1) a dataframe consisting of the average value of each indicator from 2020 to 2022 for each country and (2) a graded dataframe of the indicators.", 
+      "<br>",
+      "<br>",
+      "The (2) linear regression model had a low sample size for each grade, leading to high multicollinearity. It had low varaition within groups and no residual degrees of freedom. Therefore, a linear regression model was tested on (1) and the following results is shown below. The PGP (population growth) has the largest coefficient magnitude, although the significance was unable to be calculated. Another analysis is required."),
+  color = "#084b83"
+)
+```
+
+
+```{r linear_regression}
+# Attempting linear regression to find strongest predictor
+model <- lm(avg_cfr ~ pop_grade + pop_den_grade + gdp_grade + 
+              le_grade + br_grade + dr_grade + pgp_grade + 
+              upp_grade + rpp_grade, data=final_analysis_df)
+#summary(model)
+#anova(model)
+
+#' Low sample size, leading to high multicollinearity, low variation 
+#' within groups and no residual degrees of freedom. Other analysis 
+#' required to find strongest predictor.
+
+#' Try linear regression using average CFR as the response and 
+#' socioeconomic indicators as continuous values, not grades. Create a new
+#' data frame for this.
+final_analysis_df_cont <- average_cfr
+final_analysis_df_cont <- average_cfr[,c(1,5)]
+final_analysis_df_cont$pop_values <- socioecon_df_pop$avg_values
+final_analysis_df_cont$pop_den_values <- socioecon_df_pop_den$avg_values
+final_analysis_df_cont$gdp_values <- socioecon_df_gdp$avg_values
+final_analysis_df_cont$gni_values <- socioecon_df_gni$avg_values
+final_analysis_df_cont$le_values <- socioecon_df_le$avg_values
+final_analysis_df_cont$br_values <- socioecon_df_br$avg_values
+final_analysis_df_cont$dr_values <- socioecon_df_dr$avg_values
+final_analysis_df_cont$pgp_values <- socioecon_df_pgp$avg_values
+final_analysis_df_cont$upp_values <- socioecon_df_upp$avg_values
+final_analysis_df_cont$rpp_values <- socioecon_df_rpp$avg_values
+
+model2 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               gni_values + le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+#plot(final_analysis_df_cont$avg_cfr,fitted(model2))
+#' Unable to plot due to NAs in GNI values. Remove GNI indicator from model 
+#' to correct this, as opposed to removing countries with NA GNI values.
+model3 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### Linear Regression Table (1)
+
+```{r linear_regression_table}
+pander(model3)
+#' PGP has the largest coefficient magnitude, though significance unable 
+#' to be calculated. Another analysis required.
+
+```
+
+### Linear Regression Plot (1)
+
+```{r linear_regression_plot}
+#' Plotting the actual values of average CFR vs the fitted values from 
+#' the model
+#plot(final_analysis_df_cont$avg_cfr,fitted(model3))
+# Plotting the above with ggplot and line of perfect fit (y=x)
+ggplot(final_analysis_df_cont, aes(x=avg_cfr, y=fitted(model3))) +
+  geom_point() + xlab("Average CFR") + ylab("Fitted Average CFR Values") +
+  geom_abline(slope=1) +
+  theme_minimal()
+```
+
+
+Row {data-height= 150}
+-----------------------------------------------------------------------
+### Correlation
+
+```{r valueBox_correlation}
+valueBox(
+  value = "Correlation",
+  caption = 
+    paste0(
+      "Using the first (1) dataframe consisting of the average value of each indicator (continuous)from 2020 to 2022 for each country, a correlation analysis was done against all the predictor and response variables as shown below. Life expectancy has the largest magnitude correlation with average CFR, with population density as a close second."),
+  color = "#084b83"
+)
+```
+
+Row {data-height=550}
+-----------------------------------------------------------------------
+### Correlation Plot
+
+```{r correlation}
+#' Run correlation analysis using continuous data, after removing country 
+#' name variable.
+final_analysis_df_cont <- final_analysis_df_cont[,-c(1)]
+
+correlation_object <- cor(final_analysis_df_cont)
+corrplot(correlation_object, method = "number", tl.cex=0.5, 
+         number.cex = 0.5, type = "upper")
+#' Life expectancy has the largest magnitude correlation with average CFR,
+#' with population density as a close second.
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### L
+
+```{r indicators}
+
+
+```
+
+### Lv
+
+```{r indicator}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
