@@ -775,7 +775,7 @@ average_mr$avg_mr_percent <- average_mr$avg_mr*100
 
 ```
 
-Row {data-height=450}
+Row {data-height=550}
 -----------------------------------------------------------------------
 ### COVID-19 Analysis Key Metrics
 ```{r valueBox_analysis}
@@ -837,6 +837,7 @@ ggplotly(ggplot(prevalence_long, aes(x = year,
 ```
 
 ### Case Fatality Rate
+
 ```{r, cfr, fig.width=10, fig.height=5}
 
 # Reshape data to long format for plotting
@@ -866,6 +867,7 @@ ggplotly(ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color 
 ```
 
 ### Mortality Rate
+
 ```{r, mr, fig.width=10, fig.height=5}
 
 # Reshape data to long format for plotting
@@ -1159,7 +1161,7 @@ final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
 
 ```
 
-Row {data-height=290}
+Row {data-height=320}
 -----------------------------------------------------------------------
 ### Indicators of COVID-19 Case Fatality Rate
 
@@ -1181,7 +1183,7 @@ valueBox(
 )
 ```
 
-Row {data-height=225}
+Row {data-height=250}
 -----------------------------------------------------------------------
 ### Linear Regression Models
 
@@ -1381,6 +1383,6 @@ valueBox(
        "<br>",
        "<br>",
       "**INSERT REFERENCES**"),
-  color = "#084b83",
+  color = "#374785",
 )
 ```
