@@ -1,25 +1,21 @@
 # TheVeryBest
 The Very Best Team - COVID-19 Overview Dashboard Project Plan
 
-1) covid19_summary
-Choose countries (high spread, low spread, high mortality, low mortality); around 3 from each group, list has 12 total - Vian 
-https://data.who.int/dashboards/covid19/data
 
-a) Sorta EDA moment - total global cases and total global deaths (for the dashboard) 
+1) covid19_summary - Vian 
 
-b) Do we need to rename the names (ie. CÔøΩte d'Ivoire)?
+a) EDA - total global cases and total global deaths (https://data.who.int/dashboards/covid19/data)
 
-c) Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population, and Deaths...cumulative.total.per.100000.population and rename the variables
+b) Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population, and Deaths...cumulative.total.per.100000.population and rename the variables
 
-d) Select three countries from the top 10 countries with the highest number of total cases per 100K population (high spread countries).
+c) Select three countries from the top 10 countries with the highest number of total cases per 100K population (high spread countries): Cyprus, Austria, and Republic of Korea
 
-e) Select three other countries where number of total cases per 100K population is less than 10,000 (low spread countries).
+d) Select three other countries where number of total cases per 100K population is less than 10,000 (low spread countries): Cuba, Guyana, and Iran
 
-f) Select three countries from the top 10 countries with the highest number of total deaths per 100K population (high mortality countries)
+e) Select three countries from the top 10 countries with the highest number of total deaths per 100K population (high mortality countries): Peru, Hungary, and Bosnia and Herzegovina
 
-g) Select three other countries where number of total deaths per 100K population is less than 250 (low mortality countries)
+f) Select three other countries where number of total deaths per 100K population is less than 250 (low mortality countries): Guam, Bahamas, and Germany
 
-Maybe display it as graphs of the 3 choices and their respective cumulative case/death score?
 
 2) socioeconomic_indicators - Bilal, Trinley
 
@@ -29,28 +25,37 @@ a) Obtain primary and additional socioeconomic indicators from API
   - Economic indicators: GDP, GNI, net income per capita, poverty headcount ratio
   - Social indicators: Life expectancy, GINI index, adult literacy rate (% of people ages 15 and above)
 
+b) Filtered data by countries of interest within the 2020-2022 timeframe
 
 
 3) peak_pandemic - Tenzin
 
-a) Calculate prevalence, case fatality rate, and mortality rate
+a) Calculate prevalence: confirmed cases / total population
+
+b) Case fatality rate (CFR): confirmed deaths / confirmed cases
+
+c) Mortality rate (MR): confirmed deaths / total population
+  - Prevalence, CFR, and MR all calculated indivudally for years 2020-2022, as well as an average value calculated over the 3-year period
+
 
 4) statistical_analysis - Bilal, Tenzin
 
 a) Thresholds for socioeconomic indicators
+ - Extract socioeconomic indicator data from API for all countries to aid with setting thresholds
+ - Determine quantile distributions of global data for each indicator to set thresholds, convert the grades to factors
+   
+b) Create dataframe for final analysis with average CFR and all socioeconomic indicator grades for all countries of interest
 
-b) Single out one indicator that is the best indicators 
+c) Run linear regression to identify strongest predictor
+ - Intially test with categorical data; can use continuous data if this fails
+   
+d) Run other analyses if necessary (e.g. correlation analysis)
 
-c) run some quick and dirty analysis on all your indicators to figure out which one looks the strongest
+e) Use ANOVA to compare strongest predictors and determine significance
 
-d) ANOVA
-
-e) Regression and p value
-
-f) Correlation  
 
 5) dashboard_creation - Vian, Trinley
-
+   
 a) COVID-19 summary
 
 b) Country Indicators: 
@@ -59,7 +64,7 @@ b) Country Indicators:
   - The plots should be interactive such that the user can obtain more information by hovering above each bar
   - For each group of indicators, create a tabset display to include all stacked bar plots for the specific appropriate indicators
   - State where the data is from
-
+    
 c) COVID-19 Analysis: Key Metrics
   - Create a value box at the top that talks about what this page displays, the general trend seen in the graphs, and how to interact with the plots
   - Create interactive line graphs displaying the calculated COVID-19 prevalence, case fatality, and mortality rates throughout 2020-2022 with plotly
@@ -69,3 +74,5 @@ c) COVID-19 Analysis: Key Metrics
   - State where the data is from
   
 d) Statistical Analysis/Correlation
+ - Create plots to show the relationship between strongest indicators and CFR
+ - Include linear regression model/table, correlation plot, ANOVA table, and box plots
