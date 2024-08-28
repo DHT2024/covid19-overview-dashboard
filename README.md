@@ -21,11 +21,15 @@ g) Select three other countries where number of total deaths per 100K population
 
 Maybe display it as graphs of the 3 choices and their respective cumulative case/death score?
 
-2) socioeconomic_indicators - Bilal
+2) socioeconomic_indicators - Bilal, Trinley
 
 a) Obtain primary and additional socioeconomic indicators from API
+  - Specifically, look for the three groups of indicators: Population, Economic, Social
+  - Population indicators: Total population, population density, urban population (as a percentage of total population), rural population (as a percentage of total population), crude birth/death rate per 1000 people, annual population growth (%)
+  - Economic indicators: GDP, GNI, net income per capita, poverty headcount ratio
+  - Social indicators: Life expectancy, GINI index, adult literacy rate (% of people ages 15 and above)
 
-b) GDP, GNI (Economy), education, health (People), poverty, GINI index
+
 
 3) peak_pandemic - Tenzin
 
@@ -46,3 +50,22 @@ e) Regression and p value
 f) Correlation  
 
 5) dashboard_creation - Vian, Trinley
+
+a) COVID-19 summary
+
+b) Country Indicators: 
+  - Create three separate sections for each group of indicators by using value boxes to indicate which group the displayed data is a part of
+  - Create stacked bar plots for each country displaying the measurements for each of the indicators for each year with plotly
+  - The plots should be interactive such that the user can obtain more information by hovering above each bar
+  - For each group of indicators, create a tabset display to include all stacked bar plots for the specific appropriate indicators
+  - State where the data is from
+
+c) COVID-19 Analysis: Key Metrics
+  - Create a value box at the top that talks about what this page displays, the general trend seen in the graphs, and how to interact with the plots
+  - Create interactive line graphs displaying the calculated COVID-19 prevalence, case fatality, and mortality rates throughout 2020-2022 with plotly
+  - Create a tabset to display the three graphs such that they each take up a single tab
+  - Create an interactive table that displays the average prevalence, case fatality, and mortality rates for all 12 countries. 
+  - Create a tabset to display these tables such that each table takes up a single tab
+  - State where the data is from
+  
+d) Statistical Analysis/Correlation
