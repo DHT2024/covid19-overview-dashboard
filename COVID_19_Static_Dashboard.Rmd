@@ -1361,7 +1361,7 @@ boxplot_le
 
 About
 =======================================================================
-Row {data-height=350}
+Row {data-height=550}
 -----------------------------------------------------------------------
 
 ### About
@@ -1382,7 +1382,18 @@ valueBox(
 "Threshold values for the select countries were determined by identifying the quantile values (0.2, 0.4, 0.6, and 0.8) for each indicator based on global data. Thresholds were set at these values to ensure that the select countries were grouped relative to all available indicator data sourced from countries around the world.",
        "<br>",
        "<br>",
-      "**INSERT REFERENCES**"),
+      "<i>References</i>",
+"<br>",
+"Brakefield, W. S., Olusanya, O. A., White, B. & Shaban-Nejad, A. Social Determinants and Indicators of COVID-19 Among Marginalized Communities: A Scientific Review and Call to Action for Pandemic Response and Recovery. Disaster Med Public Health Prep 1–10 (2022).",
+"<br>",
+"Darin-Mattsson, A., Fors, S. & Kåreholt, I. Different indicators of socioeconomic status and their relative importance as determinants of health in old age. International Journal for Equity in Health 16, 173 (2017).",
+"<br>",
+"Lantz, P. M. & Pritchard, A. Socioeconomic Indicators That Matter for Population Health. Prev Chronic Dis 7, A74 (2010).",
+"<br>",
+"Winston, L., McCann, M. & Onofrei, G. Exploring Socioeconomic Status as a Global Determinant of COVID-19 Prevalence, Using Exploratory Data Analytic and Supervised Machine Learning Techniques: Algorithm Development and Validation Study. JMIR Form Res 6, e35114 (2022).",
+"<br>",
+"World Health Organization. COVID-19 data | WHO COVID-19 dashboard. datadot http://data.who.int/dashboards/covid19/data (2024)."
+),
   color = "#374785",
 )
 ```
