@@ -1,0 +1,1399 @@
+---
+title: "COVID-19 Global Pandemic"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme:
+        version: 4 
+        bg: "#F7F9FB"
+        fg: "#2A1B3D"
+        primary: "#25274D"
+        base_font:
+          google: Prompt
+        code_font:
+          google: JetBrains Mono   
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(ggplot2)
+library(httr)
+library(jsonlite)
+library(plotly)
+library(DT)
+library(pander)
+library(corrplot)
+library(ggpubr)
+
+```
+
+```{r COVID-19 Summary, include=FALSE}
+# Import data.
+COVID <- read.csv("WHO-COVID-19-global-table-data.csv")
+
+# The global stats for total cumulative cases and per 100k population and total cumulative deaths and per 100k population
+COVID_global <- COVID %>%
+  arrange(desc(Cases...cumulative.total)) %>% 
+  head(1)
+
+# Create a subset of COVID dataset to include necessary variables such as Name, Who.Region, Cases...cumulative.total.per.100000.population,
+# and Deaths...cumulative.total.per.100000.population and rename the variables.
+COVID_clean <- COVID %>% 
+  select(Name, WHO.Region, 
+         Cases.Cumulative.Per.100k = Cases...cumulative.total.per.100000.population, 
+         Deaths.Cumulative.Per.100k = Deaths...cumulative.total.per.100000.population)
+
+```
+
+COVID-19 Summary
+=======================================================================
+
+Row {data-height=150}
+-----------------------------------------------------------------------
+### COVID-19 Summary
+```{r valueBox_summary}
+valueBox(
+  value = "COVID-19 Analysis: Key Metrics",
+  caption = "The COVID-19 summary encompasses data from 241 countries, offering a comprehensive overview of the most recent reported numbers of COVID-19 cases and deaths, as sourced from the World Health Organization (WHO). This summary provides a global perspective on the pandemic's impact, highlighting the spread and mortality.",
+  color = "#374785"
+)
+
+```
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+
+### Total Cases
+
+```{r valueboxes_total_case}
+valueBox(value = "775,867,542",
+         caption = "Total Global Cases",
+         icon = "ion-thermometer",
+         color = "#084b83")
+
+```
+
+### Total Cases per 100k Population  
+
+```{r valueboxes_total_cases_per_100k}
+valueBox(value = "4,798,837",
+         caption = "Total Global Cases per 100k Population",
+         icon = "ion-thermometer",
+         color = "#084b83")
+
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### High Spread Countries
+
+```{r high spread countries}
+# Select three countries from the top 10 countries with the highest number of total cases per 100K population.
+# Arrange the Cases.Cumulative.Per.100k column from descending and isolate the top 10 countries. 
+COVID_high_spread <- COVID_clean %>%
+  arrange(desc(Cases.Cumulative.Per.100k)) %>% 
+  head(11) # Filter for the top 11 entries because Global is also included in the top Cases.Cumulative.Per.100k.
+
+# The countries selected to represent the countries with the highest number of total cases per 100k population are 
+# Cyprus, Austria and Republic of Korea.
+COVID_high_spread <- COVID_high_spread %>%
+  filter(Name %in% c("Cyprus", "Austria", "Republic of Korea"))
+
+# Plot the countries with one of the highest number of total cases per 100k population. 
+ggplotly(ggplot(COVID_high_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
+  labs(title = "High Spread Countries",
+       x = "Country",
+       y = "Cumulative Cases Per 100K Population") +
+  ylim(0, 80000) +
+  theme_minimal()
+  )
+```
+
+### Low Spread Countries
+
+```{r low spread countries}
+# Select three other countries where number of total cases per 100K population is less than 10,000.
+# Filter Cases.Cumulative.Per.100k with less than 10000 cases and arrange in descending order.
+COVID_low_spread <- COVID_clean %>%
+  filter(Cases.Cumulative.Per.100k < 10000) %>%
+  arrange(desc(Cases.Cumulative.Per.100k))
+
+# The countries selected to represent the countries with <10,000 cases per 100k population are 
+# Cuba, Guyana, Iran.
+COVID_low_spread <- COVID_low_spread %>%
+  filter(Name %in% c("Cuba", "Guyana", "Iran (Islamic Republic of)"))
+
+# Plot the countries with <10k total cases per 100k population.
+ggplotly(ggplot(COVID_low_spread, aes(x = Name, y = Cases.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
+  labs(title = "Low Spread Countries",
+       x = "Country",
+       y = "Cumulative Cases Per 100K Population") +
+  ylim(0, 80000) +
+  theme_minimal()
+)
+```
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+
+### Total Deaths
+
+```{r valueboxes_total_deaths}
+valueBox(value = "7,057,145",
+         caption = "Total Global Deaths",
+         icon = "ion-alert-circled",
+         color = "#084b83")
+
+```
+
+### Total Deaths per 100k Population  
+
+```{r valueboxes_total_deaths_per_100k}
+valueBox(value = "29,394",
+         caption = "Total Global Deaths per 100k Population",
+         icon = "ion-alert-circled",
+         color = "#084b83")
+
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### High Mortality Countries 
+
+```{r high mortality countries}
+# Select three countries from the top 10 countries with the highest number of total deaths per 100K population.
+# Arrange the Deaths.Cumulative.Per.100k column from descending and isolate the top 10 countries. 
+COVID_high_mortality <- COVID_clean %>%
+  arrange(desc(Deaths.Cumulative.Per.100k)) %>% 
+  head(11) # Filter for the top 11 entries because Global is also included in the top Deaths.Cumulative.Per.100k
+
+# The countries selected to represent the countries with the highest number of total deaths per 100k population are 
+# Peru, Hungary, and Bosnia and Herzegovina. 
+COVID_high_mortality <- COVID_high_mortality %>%
+  filter(Name %in% c("Peru", "Hungary", "Bosnia and Herzegovina"))
+
+# Plot the countries with one of the highest number of total death per 100k population. 
+ggplotly(ggplot(COVID_high_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
+  labs(title = "High Mortality Countries",
+       x = "Country",
+       y = "Cumulative Deaths Per 100K Population") +
+  ylim(0, 800) +
+  theme_minimal()
+)
+```
+
+### Low Mortality Countries 
+
+```{r low mortality countries}
+
+# Select three other countries where number of total deaths per 100K population is less than 250. 
+# Filter Deaths.Cumulative.Per.100k with less than 250 deaths and arrange in descending order.
+COVID_low_mortality <- COVID_clean %>%
+  filter(Deaths.Cumulative.Per.100k < 250) %>%
+  arrange(desc(Deaths.Cumulative.Per.100k))
+
+# The countries selected to represent the countries with <10,000 deaths per 100k population are 
+# Guam, Bahamas, Germany
+COVID_low_mortality <- COVID_low_mortality %>% 
+  filter(Name %in% c("Guam", "Bahamas", "Germany"))
+
+# Plot the countries with <10k total death per 100k population.
+ggplotly(ggplot(COVID_low_mortality, aes(x = Name, y = Deaths.Cumulative.Per.100k)) +
+  geom_bar(stat = "identity", fill = "#2e9cca") +
+  labs(title = "Low Mortality Countries",
+       x = "Country",
+       y = "Cumulative Deaths Per 100K Population") +
+  ylim(0, 800) +
+  theme_minimal()
+)
+```
+
+Country Indicators
+=======================================================================
+
+```{r API}
+# Extract demographic and socioeconomic indicator from World Bank API
+# Build query
+base <- "https://api.worldbank.org/v2"
+endpoint <- "/country/AUT;KOR;CYP;GUY;CUB;IRN;PER;HUN;BIH;BHS;DEU;GUM"
+query <- "/indicator/SP.POP.TOTL;EN.POP.DNST;NY.GDP.MKTP.CD;NY.GNP.MKTP.CD;SP.DYN.LE00.IN;SI.POV.NAHC;SI.POV.GINI;SE.ADT.LITR.ZS;NY.ADJ.NNTY.PC.CD;SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
+output_format <- "?format=json&per_page=5000&date=2020:2022&source=2"
+
+# Combine all parts of the query to produce a call
+call <- paste0(base, endpoint, query, output_format)
+
+# Get info from call and check status
+get_data <- GET(call)
+
+# Extract content from the request
+get_data_text <- content(get_data, "text")
+
+# Convert JSON file into an R object
+get_data_json <- fromJSON(get_data_text, flatten = T)
+
+# Converted information to dataframe
+socioecon_df <- get_data_json[2][[1]]
+
+# Renamed column names and select relevant columns
+socioecon_df <- socioecon_df %>% 
+  rename(
+    country_iso = countryiso3code,
+    year = date,
+    socioecon_id = indicator.id,
+    socioecon_indicator = indicator.value,
+    country = country.value
+    ) %>% 
+  select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+# Renamed values in socioeconomic indicators dataframe to make pivoting dataframe easier
+socioecon_df$country[which(socioecon_df$country == "Bahamas, The")] <- "Bahamas"
+socioecon_df$country[which(socioecon_df$country == "Iran, Islamic Rep.")] <- "Iran (Islamic Republic of)"
+socioecon_df$country[which(socioecon_df$country == "Korea, Rep.")] <- "Republic of Korea"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population, total")] <- "pop_total"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population density (people per sq. km of land area)")] <- "pop_density"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "GDP (current US$)")] <- "gdp"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "GNI (current US$)")] <- "gni"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Life expectancy at birth, total (years)")] <- "life_expectancy"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Poverty headcount ratio at national poverty lines (% of population)")] <- "poverty_ratio"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Gini index")] <- "gini"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Literacy rate, adult total (% of people ages 15 and above)")] <- "literacy_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Adjusted net national income per capita (current US$)")] <- "national_income_capita"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Birth rate, crude (per 1,000 people)")] <- "birth_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Death rate, crude (per 1,000 people)")] <- "death_rate"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Population growth (annual %)")] <- "pop_growth"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Urban population (% of total population)")] <- "urban_pop"
+socioecon_df$socioecon_indicator[which(socioecon_df$socioecon_indicator == "Rural population (% of total population)")] <- "rural_pop"
+
+# Cleaning up dataframe containing socioeconomic indicators such that each indicator has its own column.
+cleaned_socioecon <- pivot_wider(socioecon_df, id_cols = country:year, names_from = socioecon_indicator, values_from = value)
+cleaned_socioecon <- cleaned_socioecon %>%
+  arrange(country, year)
+
+```
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+### Population Indicator
+```{r valueboxes_pop_indicator}
+valueBox(value = "Population Indicators",
+         caption = "Data from World Bank 2024.",
+         icon = "fas fa-people-group",
+         color = "#084b83")
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Total Population
+```{r total population plot}
+# Plot total population for all countries
+
+pop_tot_chart <- ggplot(cleaned_socioecon, 
+       aes(x = pop_total, y = reorder(country, pop_total), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Population Total by Country (2020-2022)",
+       x = "Total Population",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(pop_tot_chart)
+```
+
+### Population Density
+```{r population density plot}
+# Plot population density for all countries
+# No population density for 2022.
+
+pop_dens_chart <- ggplot(cleaned_socioecon %>% filter(year != 2022), 
+       aes(x = pop_density, y = reorder(country, pop_density), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Population Density by Country (per sq. km) (2020-2021)",
+       x = "Population Density (per sq. km)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(pop_dens_chart)
+```
+
+
+### Urban Population (%)
+```{r urban population plot}
+
+# Plot urban population % for all countries
+urban_pop_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(urban_pop)), 
+       aes(x = urban_pop, y = reorder(country, urban_pop), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Urban Population As a Percent of Population by Country (2020-2022)",
+       x = "Urban Population (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(urban_pop_chart)
+```
+
+### Rural population (%)
+```{r rural population plot}
+
+# Plot rural population % for all countries
+rural_pop_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(rural_pop)), 
+       aes(x = rural_pop, y = reorder(country, rural_pop), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Rural Population As a Percent of Population by Country (2020-2022)",
+       x = "Rural Population (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(rural_pop_chart)
+```
+
+### Birth Rate
+```{r birth rate plot}
+
+# Plot birth rate for all countries
+birth_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(birth_rate)), 
+       aes(x = birth_rate, y = reorder(country, birth_rate), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Crude Birth Rate per 1000 People by Country (2020-2022)",
+       x = "Crude Birth Rate (per 1000 people)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(birth_chart)
+```
+
+### Death Rate
+```{r death rate plot}
+
+# Plot death rate for all countries
+death_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(death_rate)), 
+       aes(x = death_rate, y = reorder(country, death_rate), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Crude Death Rate per 1000 People by Country (2020-2022)",
+       x = "Crude Death Rate (per 1000 people)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(death_chart)
+```
+
+### Annual Population Growth (%)
+```{r annual pop growth plot}
+
+# Plot annual population growth for all countries
+annual_pop_growth_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(pop_growth)), 
+       aes(x = pop_growth, y = reorder(country, pop_growth), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Annual Population Growth by Country (2020-2022)",
+       x = "Annual Population Growth (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(annual_pop_growth_chart)
+```
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+### Economic Indicator
+```{r valueboxes_economic_indicator}
+valueBox(value = "Economic Indicators",
+         caption = "Data from World Bank 2024.",
+         icon ="fas fa-sack-dollar",
+         color = "#084b83")
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### GDP (current USD)
+```{r gdp plot}
+
+# Plot GDP for all countries
+gdp_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gdp)), 
+       aes(x = gdp, 
+           y = reorder(country, gdp), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Gross Domestic Product (GDP) in Current USD by Country (2020-2022)",
+       x = "GDP (in USD)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(gdp_chart)
+```
+
+### GNI (current USD)
+```{r gni plot}
+
+# Plot GNI for all countries
+gni_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gni)), 
+       aes(x = gni, 
+           y = reorder(country, gni), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Gross National Income (GNI) in Current USD by Country (2020-2022)",
+       x = "GNI (in USD)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(gni_chart)
+```
+
+### Adjusted Net National Income per Capita (current USD)
+```{r net income plot}
+
+# Plot Net National Income Per Capita for all countries
+net_income_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(national_income_capita)), 
+       aes(x = national_income_capita / 1e3, 
+           y = reorder(country, national_income_capita), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Adjusted Net National Income per Capita (current USD) by Country (2020-2022)",
+       x = "Income per Capita (in USD Thousands)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(net_income_chart)
+```
+
+### Poverty Headcount Ratio
+```{r poverty headcount plot}
+
+# Plot poverty headcount ratio for all countries
+poverty_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(poverty_ratio)), 
+       aes(x = poverty_ratio, 
+           y = reorder(country, poverty_ratio), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Poverty Headcount Ratio at National Poverty Line (% of Population) by Country (2020-2022)",
+       x = "Poverty Headcount Ratio (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(poverty_chart)
+```
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+### Social Indicator
+```{r valueboxes_social_indicator}
+valueBox(value = "Social Indicators",
+         caption = "Data from World Bank 2024.",
+         icon ="fas fa-network-wired",
+         color = "#084b83")
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Life Expectancy 
+```{r life expectancy plot}
+
+# Plot life expectancy for all countries
+life_expectancy_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(life_expectancy)), 
+       aes(x = life_expectancy, 
+           y = reorder(country, life_expectancy), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Life Expectancy At Birth by Country (2020-2022)",
+       x = "Life Expectancy (Years)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(life_expectancy_chart)
+```
+
+### GINI Index
+```{r gini index plot}
+
+# Plot GINI index for all countries
+gini_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(gini)), 
+       aes(x = gini, 
+           y = reorder(country, gini), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "GINI Index by Country (2020-2022)",
+       x = "GINI Index",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(gini_chart)
+```
+
+### Literacy Rate
+```{r literacy rate plot}
+
+# Plot literacy rate for all countries
+literacy_rate_chart <- ggplot(cleaned_socioecon %>% filter(!is.na(literacy_rate)), 
+       aes(x = literacy_rate, 
+           y = reorder(country, literacy_rate), fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Adult Literacy Rate (% of People Ages 15 and Above) by Country (2020-2022)",
+       x = "Literacy Rate (%)",
+       y = "Country") +
+  scale_fill_manual(values = c("2020" = "#bbe6e4", 
+                                "2021" = "#42bfdd", 
+                                "2022" = "#084b83"),
+                     name = "Year") +
+  theme_minimal() +
+  theme(legend.position = "top")
+ggplotly(literacy_rate_chart)
+```
+
+COVID-19 Analysis: 2020-2022 Overview
+=======================================================================
+```{r prevalence calculation, include = FALSE}
+# Import covid data with dates
+covid_dates <- read.csv("WHO-COVID-19-global-data.csv")
+
+# Filtered covid data with dates by countries of interest.
+covid_dates_countries <- covid_dates %>%
+  filter(Country %in% c("Austria", "Bahamas", "Bosnia and Herzegovina", "Cuba", "Cyprus", "Germany", "Guam", "Guyana", "Hungary", "Iran (Islamic Republic of)", "Republic of Korea", "Peru"))
+
+# Converted dates in covid data with dates to date format.
+covid_dates_countries$Date_reported <- as.POSIXct(covid_dates_countries$Date_reported)
+# Filtered observations between start of 2020 to end of 2022.
+covid_dates_countries_dates <- covid_dates_countries %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2022-12-31")))
+
+# Filtered API data by year and population data, then alphabetizing.
+country_population_2020 <- cleaned_socioecon %>%
+  select(country, pop_total, year) %>%
+  filter(year %in% c("2020")) %>%
+  arrange(country)
+
+country_population_2021 <- cleaned_socioecon %>%
+  select(country, pop_total, year) %>%
+  filter(year %in% c("2021")) %>% 
+  arrange(country)
+
+country_population_2022 <- cleaned_socioecon %>%
+  select(country, pop_total, year) %>%
+  filter(year %in% c("2022")) %>%
+  arrange(country)
+
+# Prevalence in 2020 = Confirmed Cases (2020) / Population (2020)
+covid_dates_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2020 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2020 <- covid_dates_2020
+prevalence_2020 <- covid_dates_2020$cases_2020 / country_population_2020$pop_total
+covid_prevalence_2020$population_2020 <- country_population_2020$pop_total
+covid_prevalence_2020$prevalence_2020 <- prevalence_2020
+covid_prevalence_2020$prevalence_2020_percent <- covid_prevalence_2020$prevalence_2020*100
+
+# Prevalence in 2021 = Confirmed Cases (2021) / Population (2021)
+covid_dates_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2021 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2021 <- covid_dates_2021
+prevalence_2021 <- covid_dates_2021$cases_2021 / country_population_2021$pop_total
+covid_prevalence_2021$population_2021 <- country_population_2021$pop_total
+covid_prevalence_2021$prevalence_2021 <- prevalence_2021
+covid_prevalence_2021$prevalence_2021_percent <- covid_prevalence_2021$prevalence_2021*100
+
+# Prevalence in 2022 = Confirmed Cases (2022) / Population (2022)
+covid_dates_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2022 = sum(New_cases, na.rm = T))
+
+covid_prevalence_2022 <- covid_dates_2022
+prevalence_2022 <- covid_dates_2022$cases_2022 / country_population_2022$pop_total
+covid_prevalence_2022$population_2022 <- country_population_2022$pop_total
+covid_prevalence_2022$prevalence_2022 <- prevalence_2022
+covid_prevalence_2022$prevalence_2022_percent <- covid_prevalence_2022$prevalence_2022*100
+
+# Average Prevalence over 2020-2022 = Avg()
+average_prevalence <- as.data.frame(covid_prevalence_2020$Country)
+average_prevalence$prevalence_2020 <- covid_prevalence_2020$prevalence_2020
+average_prevalence$prevalence_2021 <- covid_prevalence_2021$prevalence_2021
+average_prevalence$prevalence_2022 <- covid_prevalence_2022$prevalence_2022
+
+average_prevalence <- average_prevalence %>%
+  rename("Country" = "covid_prevalence_2020$Country") %>%
+  mutate(avg_prevalence = (prevalence_2020 + prevalence_2021 + prevalence_2022)/3)
+average_prevalence$avg_prevalence_percent <- average_prevalence$avg_prevalence*100
+```
+```{r CFR calculation, include=FALSE}
+#### Case Fatality Rate ####
+# CFR in 2020 = Confirmed Deaths (2020) / Confirmed Cases (2020)
+covid_deaths_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2020 = sum(New_cases, na.rm = T),
+            deaths_2020 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2020 <- covid_deaths_2020
+covid_cfr_2020$cfr_2020 <- covid_cfr_2020$deaths_2020 / covid_cfr_2020$cases_2020
+covid_cfr_2020$cfr_2020_percent <- covid_cfr_2020$cfr_2020*100
+
+# CFR in 2021 = Confirmed Deaths (2021) / Confirmed Cases (2021)
+covid_deaths_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2021 = sum(New_cases, na.rm = T),
+            deaths_2021 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2021 <- covid_deaths_2021
+covid_cfr_2021$cfr_2021 <- covid_cfr_2021$deaths_2021 / covid_cfr_2021$cases_2021
+covid_cfr_2021$cfr_2021_percent <- covid_cfr_2021$cfr_2021*100
+
+# CFR in 2022 = Confirmed Deaths (2022) / Confirmed Cases (2022)
+covid_deaths_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(cases_2022 = sum(New_cases, na.rm = T),
+            deaths_2022 = sum(New_deaths, na.rm = T))
+
+covid_cfr_2022 <- covid_deaths_2022
+covid_cfr_2022$cfr_2022 <- covid_cfr_2022$deaths_2022 / covid_cfr_2022$cases_2022
+covid_cfr_2022$cfr_2022_percent <- covid_cfr_2022$cfr_2022*100
+
+# Average CFR over 2020-2022 = Avg()
+average_cfr <- as.data.frame(covid_cfr_2020$Country)
+average_cfr$cfr_2020 <- covid_cfr_2020$cfr_2020
+average_cfr$cfr_2021 <- covid_cfr_2021$cfr_2021
+average_cfr$cfr_2022 <- covid_cfr_2022$cfr_2022
+
+average_cfr <- average_cfr %>%
+  rename("Country" = "covid_cfr_2020$Country") %>%
+  mutate(avg_cfr = (cfr_2020 + cfr_2021 + cfr_2022)/3)
+average_cfr$avg_cfr_percent <- average_cfr$avg_cfr*100
+
+```
+```{r Mortality Rate calculation}
+#### Mortality Rate ####
+# MR in 2020 = Confirmed Deaths (2020) / Population (2020)
+covid_mortality_2020 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2020-01-01"),as.Date("2020-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2020 = sum(New_deaths, na.rm = T))
+
+covid_mr_2020 <- covid_mortality_2020
+mr_2020 <- covid_mr_2020$deaths_2020 / country_population_2020$pop_total
+covid_mr_2020$population_2020 <- country_population_2020$pop_total
+covid_mr_2020$mr_2020 <- mr_2020
+covid_mr_2020$mr_2020_percent <- covid_mr_2020$mr_2020*100
+
+# MR in 2021 = Confirmed Deaths (2021) / Population (2021)
+covid_mortality_2021 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2021-01-01"),as.Date("2021-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2021 = sum(New_deaths, na.rm = T))
+
+covid_mr_2021 <- covid_mortality_2021
+mr_2021 <- covid_mr_2021$deaths_2021 / country_population_2021$pop_total
+covid_mr_2021$population_2021 <- country_population_2021$pop_total
+covid_mr_2021$mr_2021 <- mr_2021
+covid_mr_2021$mr_2021_percent <- covid_mr_2021$mr_2021*100
+
+# MR in 2022 = Confirmed Deaths (2022) / Population (2022)
+covid_mortality_2022 <- covid_dates_countries_dates %>%
+  filter(between(Date_reported,as.Date("2022-01-01"),as.Date("2022-12-31"))) %>%
+  group_by(Country) %>%
+  summarize(deaths_2022 = sum(New_deaths, na.rm = T))
+
+covid_mr_2022 <- covid_mortality_2022
+mr_2022 <- covid_mr_2022$deaths_2022 / country_population_2022$pop_total
+covid_mr_2022$population_2022 <- country_population_2022$pop_total
+covid_mr_2022$mr_2022 <- mr_2022
+covid_mr_2022$mr_2022_percent <- covid_mr_2022$mr_2022*100
+
+# Average MR over 2020-2022 = Avg()
+average_mr <- as.data.frame(covid_mr_2020$Country)
+average_mr$mr_2020 <- covid_mr_2020$mr_2020
+average_mr$mr_2021 <- covid_mr_2021$mr_2021
+average_mr$mr_2022 <- covid_mr_2022$mr_2022
+
+average_mr <- average_mr %>%
+  rename("Country" = "covid_mr_2020$Country") %>%
+  mutate(avg_mr = (mr_2020 + mr_2021 + mr_2022)/3)
+average_mr$avg_mr_percent <- average_mr$avg_mr*100
+
+```
+
+Row {data-height=550}
+-----------------------------------------------------------------------
+### COVID-19 Analysis Key Metrics
+```{r valueBox_analysis}
+valueBox(
+  value = "COVID-19 Analysis: Key Metrics",
+  caption = 
+    paste0(
+      "This section provides an overview of the COVID-19 pandemic's impact across the 12 selected countries, specifically displaying the following critical metrics: prevalence, case fatality rate, and mortality rate. Each chart offers trends into the progression and effects of COVID-19 from 2020 to 2022.", 
+      "<br>",
+      "<br>",
+      "1. Prevalence: The prevalence chart displays the percentage of the population infected with COVID-19 each year. Notably, countries such as Austria and the Republic of Korea have shown significant spikes in prevalence, especially after the year 2021, indicating a sharp increase in COVID-19 cases. In contrast, a decrease in prevalence is noted in countries like Iran and Bosnia and Herzegovina. Meanwhile, other countries like Guyana and the Bahamas show a much flatter trend.",
+      "<br>",
+      "<br>",
+      "2. Case Fatality Rate (CFR): This chart illustrates the ratio of deaths to confirmed COVID-19 cases in percentages. Peru experienced a sharp decline after 2021, despite having the highest CFR among the 12 countries in 2020. A consistent decrease in CFR is noted in Peru, Iran, Germany, Austria, Cyprus, Republic of Korea, and Cuba. Whereas the remaining countries exhibited peaks in 2021, followed by a decline in 2022. Overall, all countries experienced a gradual decrease in CFR by 2022.",
+      "<br>",
+      "<br>",
+      "3. Mortality Rate: The mortality rate chart shows the proportion of deaths due to COVID-19 relative to the total population. Similar trends are observed with high mortality rates in Iran and Bosnia and Herzegovina during 2021, followed by a decline in 2022. While most countries had an overall reduced mortality rate by the end of 2022, Cyprus and Republic of Korea had an overall increased mortality rate. Other countries maintained relatively low and stable mortality rates over the three years.",
+      "<br>",
+      "<br>",
+      "You can interact with these plots by selecting individual countries for a focused view. Hovering over the chart lines provides precise numerical values for each metric."),
+  color = "#374785",
+)
+
+```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+### Prevalence
+
+```{r, prevalence, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+prevalence_long <- average_prevalence %>%
+  pivot_longer(cols = starts_with("prevalence_"), 
+               names_to = "year", 
+               values_to = "prevalence") %>%
+  mutate(year = case_when(
+    year == "prevalence_2020" ~ "2020",
+    year == "prevalence_2021" ~ "2021",
+    year == "prevalence_2022" ~ "2022"
+  ),
+  prevalence_percent = prevalence*100)
+
+# Line plot for prevalence over years
+ggplotly(ggplot(prevalence_long, aes(x = year, 
+                            y = prevalence_percent, 
+                            group = Country, 
+                            color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Prevalence Over Years 2020-2022",
+       x = "Year",
+       y = "Prevalence (%)",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+```
+
+### Case Fatality Rate
+
+```{r, cfr, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+cfr_long <- average_cfr %>%
+  pivot_longer(cols = starts_with("cfr_"), 
+               names_to = "year", 
+               values_to = "cfr") %>%
+  mutate(year = case_when(
+    year == "cfr_2020" ~ "2020",
+    year == "cfr_2021" ~ "2021",
+    year == "cfr_2022" ~ "2022"
+  ),
+  cfr_percent = cfr*100)
+
+# Line plot for prevalence over years
+ggplotly(ggplot(cfr_long, aes(x = year, y = cfr_percent, group = Country, color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Case Fatality Rate Over Years 2020-2022",
+       x = "Year",
+       y = "Case Fatality Rate (%)",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+```
+
+### Mortality Rate
+
+```{r, mr, fig.width=10, fig.height=5}
+
+# Reshape data to long format for plotting
+mortality_long <- average_mr %>%
+  pivot_longer(cols = starts_with("mr_"), 
+               names_to = "year", 
+               values_to = "mr") %>%
+  mutate(year = case_when(
+    year == "mr_2020" ~ "2020",
+    year == "mr_2021" ~ "2021",
+    year == "mr_2022" ~ "2022"
+  ),
+  mr_percent = mr*100)
+
+# Line plot for prevalence over years
+ggplotly(ggplot(mortality_long, aes(x = year, y = mr_percent, group = Country, color = Country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1) +
+  labs(title = "COVID-19 Mortality Rate Over Years 2020-2022",
+       x = "Year",
+       y = "Mortality Rate (%)",
+       color = "Country") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+```
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+### Average Prevalence
+```{r average prevalence}
+avg_prev <- prevalence_long %>%
+  select(Country, avg_prevalence, avg_prevalence_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_prevalence = round(avg_prevalence, 4),
+    avg_prevalence_percent = round(avg_prevalence_percent, 4)
+  ) %>%
+  rename(
+    "Average Prevalence Proportion" = avg_prevalence,
+    "Average Prevalence (%)" = avg_prevalence_percent
+  )
+datatable(avg_prev, options = list(pageLength = 6))
+```
+### Average Case Fatality Rate
+```{r average cfr}
+avg_cfr <- cfr_long %>%
+  select(Country, avg_cfr, avg_cfr_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_cfr = round(avg_cfr, 4),
+    avg_cfr_percent = round(avg_cfr_percent, 4)
+  ) %>%
+  rename(
+    "Average Case Fatality Proportion" = avg_cfr,
+    "Average Case Fatality (%)" = avg_cfr_percent
+  )
+datatable(avg_cfr, options = list(pageLength = 6))
+```
+### Average Mortality Rate
+```{r average mortality rate}
+avg_mortality <- mortality_long %>%
+  select(Country, avg_mr, avg_mr_percent) %>%
+  distinct() %>%
+  mutate(
+    avg_mr = round(avg_mr, 4),
+    avg_mr_percent = round(avg_mr_percent, 4)
+  ) %>%
+  rename(
+    "Average Mortality Proportion" = avg_mr,
+    "Average Mortality (%)" = avg_mr_percent
+  )
+datatable(avg_mortality, options = list(pageLength = 6))
+```
+Row {data-height=50}
+-----------------------------------------
+Data from World Bank 2024.
+
+
+Indicators of COVID-19 Case Fatality Rate
+=======================================================================
+
+```{r statistical_analysis}
+socioecon_df_v2 <- socioecon_df %>%
+  group_by(country, socioecon_id) %>%
+  summarize(avg_values = mean(value, na.rm = T))
+
+#' Extract demographic/socioeconomic indicator from World Bank API to create
+#' a dataframe with data for all countries to aid with setting thresholds.
+#' Build query for 2 API calls, as calling API for all countries and all
+#' desired indicators is too large of a call. Two dataframes required  
+#' each with ~1/2 of desired indicators for all countries
+endpoint_all <- "/country"
+query_all_v2 <- "/indicator/SP.DYN.CBRT.IN;SP.DYN.CDRT.IN;SP.POP.GROW;SP.URB.TOTL.IN.ZS;SP.RUR.TOTL.ZS"
+# Combine all parts of the query to produce a call
+call_all <- paste0(base, endpoint_all, query, output_format)
+
+call_all_v2 <- paste0(base, endpoint_all, query_all_v2, output_format)
+
+# Get info from call and check status
+get_data_all <- GET(call_all)
+
+get_data_all_v2 <- GET(call_all_v2)
+
+# Extract content from the request
+get_data_text_all <- content(get_data_all, "text")
+
+get_data_text_all_v2 <- content(get_data_all_v2, "text")
+# Convert JSON file into an R object
+get_data_json_all <- fromJSON(get_data_text_all, flatten = T)
+
+get_data_json_all_v2 <- fromJSON(get_data_text_all_v2, flatten = T)
+# Converted information to dataframe
+socioecon_df_all <- get_data_json_all[2][[1]]
+
+socioecon_df_all_v2 <- get_data_json_all_v2[2][[1]]
+
+# Renamed column names and select relevant columns
+socioecon_df_all <- socioecon_df_all %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+socioecon_df_all_v2 <- socioecon_df_all_v2 %>% rename(
+  country_iso = countryiso3code,
+  year = date,
+  socioecon_id = indicator.id,
+  socioecon_indicator = indicator.value,
+  country = country.value
+) %>% select(country, country_iso, year, socioecon_id, socioecon_indicator, value)
+
+# Total Population for each country
+socioecon_df_pop <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.POP.TOTL"),]
+
+# Checking for distribution of global population data
+pop_indices <- which(socioecon_df_all$socioecon_id == "SP.POP.TOTL")
+#quantile(socioecon_df_all$value[pop_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_pop <- socioecon_df_pop %>%
+  mutate(pop_grade = cut(avg_values, breaks = c(0, 724273, 5685807, 19603733, 125998302, Inf), 
+                         labels = c("Very Small", "Small", "Medium", "Large", "Very Large")))
+socioecon_df_pop$pop_grade <- factor(socioecon_df_pop$pop_grade, 
+                                     levels = c("Very Small", "Small", "Medium", "Large", "Very Large"))
+
+# Population Density for each country
+socioecon_df_pop_den <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "EN.POP.DNST"),]
+
+# Checking for distribution of global population density data
+pop_den_indices <- which(socioecon_df_all$socioecon_id == "EN.POP.DNST")
+#quantile(socioecon_df_all$value[pop_den_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_pop_den <- socioecon_df_pop_den %>%
+  mutate(pop_den_grade = cut(avg_values, breaks = c(0, 30.53911, 60.19171, 107.56739, 241.18333, Inf), 
+                             labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_pop_den$pop_den_grade <- factor(socioecon_df_pop_den$pop_den_grade, 
+                                             levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# GDP for each country
+socioecon_df_gdp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "NY.GDP.MKTP.CD"),]
+
+# Checking for distribution of global GDP data
+gdp_indices <- which(socioecon_df_all$socioecon_id == "NY.GDP.MKTP.CD")
+#quantile(socioecon_df_all$value[gdp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_gdp <- socioecon_df_gdp %>%
+  mutate(gdp_grade = cut(avg_values, breaks = c(0, 6.887147e+09, 2.611333e+10, 1.648734e+11, 1.414560e+12, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_gdp$gdp_grade <- factor(socioecon_df_gdp$gdp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# GNI for each country
+socioecon_df_gni <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "NY.GNP.MKTP.CD"),]
+
+# Checking for distribution of global GNI data
+gni_indices <- which(socioecon_df_all$socioecon_id == "NY.GNP.MKTP.CD")
+#quantile(socioecon_df_all$value[gni_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_gni <- socioecon_df_gni %>%
+  mutate(gni_grade = cut(avg_values, breaks = c(0, 8.209395e+09, 2.896157e+10, 1.939661e+11, 1.429618e+12, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_gni$gni_grade <- factor(socioecon_df_gni$gni_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Life expectancy for each country
+socioecon_df_le <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.LE00.IN"),]
+
+# Checking for distribution of global life expectancy data
+le_indices <- which(socioecon_df_all$socioecon_id == "SP.DYN.LE00.IN")
+#quantile(socioecon_df_all$value[le_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_le <- socioecon_df_le %>%
+  mutate(le_grade = cut(avg_values, breaks = c(0, 64.48500, 70.98600, 74.25366, 78.94400, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_le$le_grade <- factor(socioecon_df_le$le_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Birth rate (per 1000) for each country
+socioecon_df_br <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.CBRT.IN"),]
+
+# Checking for distribution of global birth rate data
+br_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.DYN.CBRT.IN")
+#quantile(socioecon_df_all_v2$value[br_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_br <- socioecon_df_br %>%
+  mutate(br_grade = cut(avg_values, breaks = c(0, 10.000, 13.099, 18.791, 28.706, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_br$br_grade <- factor(socioecon_df_br$br_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Death rate (per 1000) for each country
+socioecon_df_dr <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.DYN.CDRT.IN"),]
+
+# Checking for distribution of global death rate data
+dr_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.DYN.CDRT.IN")
+#quantile(socioecon_df_all_v2$value[dr_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_dr <- socioecon_df_dr %>%
+  mutate(dr_grade = cut(avg_values, breaks = c(0, 6.253, 7.448, 8.661, 10.200, Inf), 
+                        labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_dr$dr_grade <- factor(socioecon_df_dr$dr_grade, 
+                                   levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Population growth % for each country
+socioecon_df_pgp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.POP.GROW"),]
+
+# Checking for distribution of global population growth % data
+pgp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.POP.GROW")
+#quantile(socioecon_df_all_v2$value[pgp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_pgp <- socioecon_df_pgp %>%
+  mutate(pgp_grade = cut(avg_values, breaks = c(-999, 0.08169316, 0.69471769, 1.23729900, 2.17409124, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_pgp$pgp_grade <- factor(socioecon_df_pgp$pgp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Urban population % for each country
+socioecon_df_upp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.URB.TOTL.IN.ZS"),]
+
+# Checking for distribution of global urban population % data
+upp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.URB.TOTL.IN.ZS")
+#quantile(socioecon_df_all_v2$value[upp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_upp <- socioecon_df_upp %>%
+  mutate(upp_grade = cut(avg_values, breaks = c(0, 38.54600, 55.11800, 67.84700, 81.85058, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_upp$upp_grade <- factor(socioecon_df_upp$upp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Rural population % for each country
+socioecon_df_rpp <- socioecon_df_v2[which(socioecon_df_v2$socioecon_id == "SP.RUR.TOTL.ZS"),]
+
+# Checking for distribution of global rural population % data
+rpp_indices <- which(socioecon_df_all_v2$socioecon_id == "SP.RUR.TOTL.ZS")
+#quantile(socioecon_df_all_v2$value[rpp_indices], prob = c(0.2, 0.4, 0.6, 0.8), type = 1, na.rm=T)
+
+# Adding thresholds and converting grade to factor
+socioecon_df_rpp <- socioecon_df_rpp %>%
+  mutate(rpp_grade = cut(avg_values, breaks = c(0, 18.14942, 32.15300, 44.88200, 61.45400, Inf), 
+                         labels = c("Very Low", "Low", "Medium", "High", "Very High")))
+socioecon_df_rpp$rpp_grade <- factor(socioecon_df_rpp$rpp_grade, 
+                                     levels = c("Very Low", "Low", "Medium", "High", "Very High"))
+
+# Create final data frame with average CFR and socioeconomic grades by country
+names(average_cfr)[1] <- "country"
+final_analysis_df <- average_cfr
+final_analysis_df <- average_cfr[,c(1,5)]
+final_analysis_df$pop_grade <- socioecon_df_pop$pop_grade
+final_analysis_df$pop_den_grade <- socioecon_df_pop_den$pop_den_grade
+final_analysis_df$gdp_grade <- socioecon_df_gdp$gdp_grade
+final_analysis_df$gni_grade <- socioecon_df_gni$gni_grade
+final_analysis_df$le_grade <- socioecon_df_le$le_grade
+final_analysis_df$br_grade <- socioecon_df_br$br_grade
+final_analysis_df$dr_grade <- socioecon_df_dr$dr_grade
+final_analysis_df$pgp_grade <- socioecon_df_pgp$pgp_grade
+final_analysis_df$upp_grade <- socioecon_df_upp$upp_grade
+final_analysis_df$rpp_grade <- socioecon_df_rpp$rpp_grade
+
+```
+
+Row {data-height=320}
+-----------------------------------------------------------------------
+### Indicators of COVID-19 Case Fatality Rate
+
+```{r valueBox_indicators}
+valueBox(
+  value = "Indicator of COVID-19 Case Fatality Rate (CFR) Analysis",
+  caption = 
+    paste0(
+      "This section explores the relationship between COVID-19 case fatality rates (CFR) and a range of socioeconomic indicators. The demographic and socioeconomic data analyzed from World Bank (2024) include metrics such as total population, population density, GDP, GNI, life expectancy, birth rate, death rate, population growth, urban population (%), and rural population (%).", 
+      "<br>",
+      "<br>",
+      "The data was compiled into a comprehensive dataframe encompassing all 12 countries studied. Two versions of the dataframe were utilized for the analysis: (1) a dataframe containing the average value of each indicator from 2020 to 2022 for each country (continuous), and (2) a categorized dataframe in which indicator values were divided into quantiles and assigned to categories labeled \"Very Low\", \"Low\", \"Medium\", \"High\", or \"Very High\". The quantiles were determined at the 0.2, 0.4, 0.6, and 0.8 thresholds.",
+       "<br>",
+      "<br>",
+      "A significance level of 0.05 was applied in the analysis."),
+      "<br>",
+      "<br>",
+  color = "#374785"
+)
+```
+
+Row {data-height=250}
+-----------------------------------------------------------------------
+### Linear Regression Models
+
+```{r valueBox_linear_regression}
+valueBox(
+  value = "Linear Regression Model",
+  caption = 
+    paste0(
+      "A linear regression model was employed to identify the strongest predictor using two different dataframes: (1) a dataframe containing the average value of each indicator from 2020 to 2022 for each country, and (2) a categorized dataframe with indicators divided into quantiles.", 
+      "<br>",
+      "<br>",
+      "The linear regression model applied to the categorized dataframe faced challenges due to the small sample size within each category, leading to high multicollinearity, low variation within groups, and no residual degrees of freedom. As a result, the model was tested on the continuous dataframe (1), and the following results are presented below. Population growth (PGP) exhibited the largest coefficient magnitude, although the p-value was not significant. Further analysis is needed."),
+  color = "#084b83"
+)
+```
+
+```{r linear_regression}
+# Attempting linear regression to find strongest predictor
+model <- lm(avg_cfr ~ pop_grade + pop_den_grade + gdp_grade + 
+              le_grade + br_grade + dr_grade + pgp_grade + 
+              upp_grade + rpp_grade, data=final_analysis_df)
+#summary(model)
+#anova(model)
+
+#' Low sample size, leading to high multicollinearity, low variation 
+#' within groups and no residual degrees of freedom. Other analysis 
+#' required to find strongest predictor.
+
+#' Try linear regression using average CFR as the response and 
+#' socioeconomic indicators as continuous values, not grades. Create a new
+#' data frame for this.
+final_analysis_df_cont <- average_cfr
+final_analysis_df_cont <- average_cfr[,c(1,5)]
+final_analysis_df_cont$pop_values <- socioecon_df_pop$avg_values
+final_analysis_df_cont$pop_den_values <- socioecon_df_pop_den$avg_values
+final_analysis_df_cont$gdp_values <- socioecon_df_gdp$avg_values
+final_analysis_df_cont$gni_values <- socioecon_df_gni$avg_values
+final_analysis_df_cont$le_values <- socioecon_df_le$avg_values
+final_analysis_df_cont$br_values <- socioecon_df_br$avg_values
+final_analysis_df_cont$dr_values <- socioecon_df_dr$avg_values
+final_analysis_df_cont$pgp_values <- socioecon_df_pgp$avg_values
+final_analysis_df_cont$upp_values <- socioecon_df_upp$avg_values
+final_analysis_df_cont$rpp_values <- socioecon_df_rpp$avg_values
+
+model2 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               gni_values + le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+#plot(final_analysis_df_cont$avg_cfr,fitted(model2))
+#' Unable to plot due to NAs in GNI values. Remove GNI indicator from model 
+#' to correct this, as opposed to removing countries with NA GNI values.
+model3 <- lm(avg_cfr ~ pop_values + pop_den_values + gdp_values +
+               le_values + br_values + dr_values +
+               pgp_values + upp_values + rpp_values, data = final_analysis_df_cont)
+
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### Linear Regression Table (1)
+
+```{r linear_regression_table}
+pander(model3)
+#' PGP has the largest coefficient magnitude, though significance unable 
+#' to be calculated. Another analysis required.
+
+```
+
+### Linear Regression Plot (1)
+
+```{r linear_regression_plot}
+#' Plotting the actual values of average CFR vs the fitted values from 
+#' the model
+#plot(final_analysis_df_cont$avg_cfr,fitted(model3))
+# Plotting the above with ggplot and line of perfect fit (y=x)
+ggplotly(ggplot(final_analysis_df_cont, aes(x=avg_cfr, y=fitted(model3))) +
+  geom_point() + xlab("Average CFR") + ylab("Fitted Average CFR Values") +
+  geom_abline(slope=1) +
+  theme_minimal())
+```
+
+
+Row {data-height= 150}
+-----------------------------------------------------------------------
+### Correlation
+
+```{r valueBox_correlation}
+valueBox(
+  value = "Correlation",
+  caption = 
+    paste0(
+      "Utilizing the first dataframe (1), which consists of the average value of each indicator (continuous) from 2020 to 2022 for each country, a correlation analysis was conducted between all predictor and response variables. Life expectancy showed the strongest correlation with average CFR, followed closely by population density."),
+  color = "#084b83"
+)
+```
+
+Row {data-height=550}
+-----------------------------------------------------------------------
+### Correlation Plot
+
+```{r correlation}
+#' Run correlation analysis using continuous data, after removing country 
+#' name variable.
+final_analysis_df_cont <- final_analysis_df_cont[,-c(1)]
+
+correlation_object <- cor(final_analysis_df_cont)
+corrplot(correlation_object, method = "number", tl.cex=0.5, 
+         number.cex = 0.5, type = "upper")
+#' Life expectancy has the largest magnitude correlation with average CFR,
+#' with population density as a close second.
+```
+
+Row {data-height= 150}
+-----------------------------------------------------------------------
+### Top Indicators
+
+```{r valueBox_ANOVA}
+valueBox(
+  value = "ANOVA and Relationship between The Top Indicators and CFR",
+  caption = 
+    paste0(
+      "ANOVA was performed using dataset (2) to determine whether the mean CFR differs across country categories based on selected indicators. The indicators chosen for this analysis were life expectancy and population density. Although life expectancy had a lower p-value than population density, neither was statistically significant. The relationship between average CFR and these indicators is illustrated below. The results indicate a higher average CFR in countries classified as having very low population density and medium-level life expectancy."),
+  color = "#084b83"
+)
+```
+
+Row {data-height=175}
+-----------------------------------------------------------------------
+### ANOVA - Population Density
+
+```{r ANOVA_pop_den}
+#' Run ANOVA on the strongest predictors to determine significance.
+#' Population density
+anova_pop_den <- aov(avg_cfr ~ pop_grade, data = final_analysis_df)
+pander(anova_pop_den)
+
+```
+
+### ANOVA - Life Expectancy
+
+```{r ANOVA_le}
+# Run ANOVA on the strongest predictors to determine significance.
+# Life expectancy
+anova_le <- aov(avg_cfr ~ le_grade, data = final_analysis_df)
+pander(anova_le)
+# Life expectancy has the lower p-value, though not significant.
+```
+
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### Relationship Between Population Density and CFR
+
+```{r population_density}
+#' Graph the relationship between average CFR and population density, 
+#' second strongest predictor.
+boxplot_pop_den <- ggboxplot(final_analysis_df, x = "pop_den_grade", y = "avg_cfr", 
+                             color = "pop_den_grade", palette = c("#011f4b", "#03396c", "#005b96", "#6497b1", "#b3cde0"),
+                             ylab = "Average CFR", xlab = "Population Density Group", show.legend = FALSE)
+boxplot_pop_den <- boxplot_pop_den + theme(legend.position = "none")
+boxplot_pop_den
+```
+
+### Relationship Between Life Expectancy and CFR
+
+```{r life_expectancy}
+#' Graph the relationship between average CFR and life expectancy, 
+#' strongest predictor.
+boxplot_le <- ggboxplot(final_analysis_df, x = "le_grade", y = "avg_cfr", 
+                        color = "le_grade", palette = c("#011f4b", "#03396c", "#005b96", "#6497b1", "#b3cde0"),
+                        ylab = "Average CFR", xlab = "Life Expectancy Group", show.legend = FALSE)
+boxplot_le <- boxplot_le + theme(legend.position = "none")
+boxplot_le
+```
+
+About
+=======================================================================
+Row {data-height=550}
+-----------------------------------------------------------------------
+
+### About
+```{r valueBox}
+valueBox(
+  value = "About",
+  caption = 
+    paste0(
+      "COVID-19 data sourced from World Health Organization (WHO) database.", 
+       "<br>",
+       "<br>",
+"Global socio-economic data sourced from World Bank Indicators API v2.",
+       "<br>",
+       "<br>",
+"All icons sourced from Font Awesome.",
+       "<br>",
+       "<br>",
+"Threshold values for the select countries were determined by identifying the quantile values (0.2, 0.4, 0.6, and 0.8) for each indicator based on global data. Thresholds were set at these values to ensure that the select countries were grouped relative to all available indicator data sourced from countries around the world.",
+       "<br>",
+       "<br>",
+      "<i>References</i>",
+"<br>",
+"Brakefield, W. S., Olusanya, O. A., White, B. & Shaban-Nejad, A. Social Determinants and Indicators of COVID-19 Among Marginalized Communities: A Scientific Review and Call to Action for Pandemic Response and Recovery. Disaster Med Public Health Prep 1–10 (2022).",
+"<br>",
+"Darin-Mattsson, A., Fors, S. & Kåreholt, I. Different indicators of socioeconomic status and their relative importance as determinants of health in old age. International Journal for Equity in Health 16, 173 (2017).",
+"<br>",
+"Lantz, P. M. & Pritchard, A. Socioeconomic Indicators That Matter for Population Health. Prev Chronic Dis 7, A74 (2010).",
+"<br>",
+"Winston, L., McCann, M. & Onofrei, G. Exploring Socioeconomic Status as a Global Determinant of COVID-19 Prevalence, Using Exploratory Data Analytic and Supervised Machine Learning Techniques: Algorithm Development and Validation Study. JMIR Form Res 6, e35114 (2022).",
+"<br>",
+"World Health Organization. COVID-19 data | WHO COVID-19 dashboard. datadot http://data.who.int/dashboards/covid19/data (2024)."
+),
+  color = "#374785",
+)
+```
