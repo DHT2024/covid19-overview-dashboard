@@ -1,5 +1,4 @@
-# TheVeryBest
-The Very Best Team - COVID-19 Overview Dashboard Project Plan
+# COVID-19 Overview Dashboard Project Plan
 
 
 1) covid19_summary - Vian 
